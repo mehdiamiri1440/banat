@@ -1,0 +1,274 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.WorkOrder.PrintWrkOrdDtlModel
+@{
+    ViewBag.Title = "WrkOrdDetail";
+    Layout = "~/Views/_LayoutPagePrint.cshtml";
+}
+<input type="hidden" id="WorkOrderId" />
+<div class="row">
+    <div class="col-9">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="4"><span class="font-weight-bold">Enjeksiyon Operasyonu İş Emri</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4">
+                            <img src="../../../../global_assets/images/placeholders/placeholder.jpg" class="rounded" width="44" height="44" alt="">
+                            <span class="font-weight-bold">@Model.PlanDetailDto.SemiProductName - @Model.PlanDetailDto.SemiProductCode</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="font-weight-bold">Operatör</span>
+                        </td>
+                        <td colspan="4">
+                            @string.Format("{0} {1}",Model.PlanDetailDto.EmployeeName,Model.PlanDetailDto.EmployeeSurName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Üretilecek Tarih</span></td>
+                        <td>@Model.PlanDetailDto.DpDate.Value.ToShortDateString()</td>
+                        <td><span class="font-weight-bold">Üretilecek Miktar</span></td>
+                        <td>@Model.PlanDetailDto.MGPAmount</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Makine Press Kodu</span></td>
+                        <td>@Model.PlanDetailDto.MachineName</td>
+                        <td><span class="font-weight-bold">Vardiya</span></td>
+                        <td>@Model.PlanDetailDto.ShiftName</td>
+                    </tr>
+                    <tr>
+                        <td>Üretim Kodu</td>
+                        <td colspan="3"> <img src="/WorkOrder/CreateBarcode?wrkOrdId=@Model.WorkOrderCode"  width="60" height="60"/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-9">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="Detail">
+                <thead>
+                    <tr>
+                        <th>Malzeme Kodu</th>
+                        <th>Malzeme Adı</th>
+                        <th>Oran</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.mixBySemiProductDto)
+                    {
+                        <tr class="table-active table-border-double">
+                            <td colspan="6">@item.MixtureName</td>
+                        </tr>
+                        foreach (var item2 in Model.componentByMixIdDtos.Where(x => x.MixId == item.MixtureId))
+                        {
+                            <tr>
+                                <td>@item2.ComponentCode</td>
+                                <td>@item2.ComponentName</td>
+                                <td>@item2.ComponentRate</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@*<div class="card">
+    <div class="card-body">*@
+@*<div class="media flex-column flex-md-row mb-4">
+        <a href="#" class="align-self-md-center mr-md-3 mb-2 mb-md-0">
+
+        </a>
+
+        <div class="media-body">
+            <h5 class="media-title font-weight-semibold" id="SemiProductName">@Model.PlanDetailDto.SemiProductName</h5>
+            <ul class="list-inline list-inline-dotted text-muted mb-0">
+                <li class="list-inline-item" id="SemiProductDetailInfo">@Model.PlanDetailDto.SemiProductCode</li>
+            </ul>
+        </div>
+
+    </div>*@
+
+
+@*<div class="mb-4">
+        <h6 class="font-weight-semibold" id="workOrderDetail">İş Emri Detayı</h6>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Üretilecek Tarih:</label>
+                    <div class="col-lg-9">
+                        <label type="text" class="col-form-label text-danger" id="ProduceDate" name="ProduceDate" >@Model.PlanDetailDto.DpDate.Value.ToShortDateString()</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label class="col-lg-4 col-form-label">Üretilecek Miktar:</label>
+                    <div class="col-lg-6">
+                        <label type="text" class="col-form-label text-danger" id="MGPAmount" name="MGPAmount" >@Model.PlanDetailDto.MGPAmount</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Makine Press Kodu:</label>
+                    <div class="col-lg-6">
+                        <label type="text" class="col-form-label" id="MachineCode" name="MachineCode">@Model.PlanDetailDto.MachineName</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label class="col-lg-4 col-form-label">Vardiya:</label>
+                    <div class="col-lg-6">
+                        <label type="text" class="col-form-label" id="ShiftCode" name="ShiftCode">@Model.PlanDetailDto.ShiftName</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label">Üretim Kodu:</label>
+                    <div class="col-lg-9">
+                        <img src="/WorkOrder/CreateBarcode?wrkOrdId=@Model.WorkOrderId"  />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+@*<div class="d-sm-flex">
+
+        <div class="ml-sm-auto mt-2 mt-sm-0">
+            <a href="#" class="btn btn-success">
+                <i class="icon-checkmark3 mr-2"></i>
+                Yazdır
+            </a>
+        </div>
+    </div>*@
+@*</div>
+    </div>*@
+@*<div class="card">
+    <div class="table-responsive">
+                    <table class="table text-nowrap" id="Detail">
+                        <thead>
+                            <tr>
+                                <th>Malzeme Kodu</th>
+                                <th>Malzeme Adı</th>
+                                <th>Oran</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.mixBySemiProductDto)
+                            {
+                                <tr class="table-active table-border-double">
+                                    <td colspan="6">@item.MixtureName</td>
+                                </tr>
+                                foreach(var item2 in Model.componentByMixIdDtos.Where(x => x.MixId == item.MixtureId))
+                                {
+                                    <tr>
+                                        <td><span class="text-muted">@item2.ComponentCode</span></td>
+                                        <td><span class="text-success-600">@item2.ComponentName</span></td>
+                                        <td><h6 class="font-weight-semibold mb-0"> @item2.ComponentRate</h6></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+        </div>*@
+
+
+@section PageScripts{
+    <script>
+
+                            //$(document).ready(function (){
+
+                            //    $.urlParam = function (name) {
+                            //        var results = new RegExp('[\?&]' + name + '=([^&#]*)')
+                            //            .exec(window.location.search);
+
+                            //        return (results !== null) ? results[1] || 0 : false;
+                            //    }
+
+                            //    var wrkOrdId=($.urlParam('wrkOrdId'));
+
+
+
+                            //    $.ajax({
+                            //        type: "GET",
+                            //        url: "/WorkOrder/GetWrkOrdDtl",
+                            //        contentType: "application/json; charset=utf-8",
+                            //        data: { wrkOrdId: wrkOrdId },
+                            //        async: false,
+                            //        success: function (data, status) {
+                            //            console.log(data);
+                            //            $('#DetailPlanId').val(data.PlanDetailDto.DpId);
+                            //            $('#SemiProductName').text(data.PlanDetailDto.SemiProductName);
+                            //            $('#SemiProductDetailInfo').text(data.PlanDetailDto.SemiProductCode + " " + data.PlanDetailDto.SemiProductDescription);
+                            //            //$('#workOrderDetail').after("<p>" + data.PlanDetailDto.MGPAmount + " Adet Üretilmesi Planlanmıştır</p>");
+                            //            $('#MGPAmount').text(data.PlanDetailDto.MGPAmount);
+                            //            $('#MachineCode').text(data.PlanDetailDto.MachineCode + " " + data.PlanDetailDto.MachineName);
+                            //            $('#ShiftCode').text(data.PlanDetailDto.ShiftName);
+                            //            var MyDate_String_Value = data.PlanDetailDto.DpDate
+                            //            var wrkDate = new Date(parseInt(MyDate_String_Value.replace(/(^.*\()|([+-].*$)/g, '')));
+
+                            //            console.log(moment(wrkDate).valueOf())
+                            //            $('#ProduceDate').text(moment(wrkDate).format('DD/MM/YYYY'));
+
+                            //            for (var i = 0; i < data.mixBySemiProductDto.length; i++) {
+
+                            //                $('#Detail > tbody').append('<tr class="table-active table-border-double">' +
+                            //                    '<td colspan="6">' + data.mixBySemiProductDto[i].MixtureCode + ' ' + data.mixBySemiProductDto[i].MixtureName + '</td> </tr>');
+
+                            //                $.ajax({
+                            //                    type: "GET",
+                            //                    url: "/WorkOrder/GetComponentForMix",
+                            //                    contentType: "application/json; charset=utf-8",
+                            //                    dataType: "json",
+                            //                    async: false,
+                            //                    data: {
+                            //                        mixId: data.mixBySemiProductDto[i].MixtureId
+                            //                    },
+                            //                    success: function (data, status) {
+                            //                        for (var j = 0; j < data.length; j++) {
+                            //                            debugger;
+                            //                            $('#Detail > tbody').append('<tr>' +
+                            //                                '<td><span class="text-muted">' + data[j].ComponentCode + '</span></td>' +
+                            //                                '<td><span class="text-success-600">' + data[j].ComponentName + '</span></td>' +
+                            //                                '<td><h6 class="font-weight-semibold mb-0">' + data[j].ComponentRate + '</h6></td></tr >');
+                            //                        }
+
+                            //                    },
+                            //                    error: function (xhr, status, err) {
+                            //                        alert('error')
+
+                            //                    }
+                            //                })
+
+                            //            }
+
+                            //        },
+                            //        error: function (xhr, status, err) {
+                            //            alert('error')
+
+                            //        }
+                            //    });
+
+                            //    window.status = "READY";
+                            //})
+
+    </script>
+
+}

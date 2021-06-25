@@ -1,0 +1,30 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Role.RoleAddViewModel
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newRoleForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Yeni Rol Tanımlama Sayfası</strong></h5>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("Add", "Role", FormMethod.Post))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.AntiForgeryToken()
+                  
+            <div class="form-group">
+                <label for="Type">Adı</label>
+                @Html.TextBoxFor(x => x.Role.Name, new { @class = "form-control", @placeholder = "Adı" })
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+            
+        }
+    </div>
+</div>
+
+

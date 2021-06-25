@@ -1,0 +1,249 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Account.NewUserViewModel
+@{
+    ViewBag.Title = "NewUser";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+@section ThemePageScripts {
+    <script src="~/global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+}
+
+@section PageScripts
+{
+    <script>
+        var InputsCheckboxesRadios = function () {
+
+
+            //
+            // Setup components
+            //
+
+            // Uniform
+            var _componentUniform = function () {
+                if (!$().uniform) {
+                    console.warn('Warning - uniform.min.js is not loaded.');
+                    return;
+                }
+
+                // Default initialization
+                $('.form-check-input-styled').uniform();
+
+
+                //
+                // Contextual colors
+                //
+
+                // Primary
+                $('.form-check-input-styled-primary').uniform({
+                    wrapperClass: 'border-primary-600 text-primary-800'
+                });
+
+                // Danger
+                $('.form-check-input-styled-danger').uniform({
+                    wrapperClass: 'border-danger-600 text-danger-800'
+                });
+
+                // Success
+                $('.form-check-input-styled-success').uniform({
+                    wrapperClass: 'border-success-600 text-success-800'
+                });
+
+                // Warning
+                $('.form-check-input-styled-warning').uniform({
+                    wrapperClass: 'border-warning-600 text-warning-800'
+                });
+
+                // Info
+                $('.form-check-input-styled-info').uniform({
+                    wrapperClass: 'border-info-600 text-info-800'
+                });
+
+                // Custom color
+                $('.form-check-input-styled-custom').uniform({
+                    wrapperClass: 'border-indigo-600 text-indigo-800'
+                });
+            };
+
+            // Switchery
+            var _componentSwitchery = function () {
+                if (typeof Switchery == 'undefined') {
+                    console.warn('Warning - switchery.min.js is not loaded.');
+                    return;
+                }
+
+                // Initialize multiple switches
+                var elems = Array.prototype.slice.call(document.querySelectorAll('.form-check-input-switchery'));
+                elems.forEach(function (html) {
+                    var switchery = new Switchery(html);
+                });
+
+                // Colored switches
+                var primary = document.querySelector('.form-check-input-switchery-primary');
+                var switchery = new Switchery(primary, { color: '#2196F3' });
+
+                var danger = document.querySelector('.form-check-input-switchery-danger');
+                var switchery = new Switchery(danger, { color: '#EF5350' });
+
+                var warning = document.querySelector('.form-check-input-switchery-warning');
+                var switchery = new Switchery(warning, { color: '#FF7043' });
+
+                var info = document.querySelector('.form-check-input-switchery-info');
+                var switchery = new Switchery(info, { color: '#00BCD4' });
+            };
+
+            // Bootstrap switch
+            var _componentBootstrapSwitch = function () {
+                if (!$().bootstrapSwitch) {
+                    console.warn('Warning - switch.min.js is not loaded.');
+                    return;
+                }
+
+                // Initialize
+                $('.form-check-input-switch').bootstrapSwitch();
+            };
+
+
+            //
+            // Return objects assigned to module
+            //
+
+            return {
+                initComponents: function () {
+                    _componentUniform();
+                    _componentSwitchery();
+                    _componentBootstrapSwitch();
+                }
+            }
+        }();
+        document.addEventListener('DOMContentLoaded', function () {
+            InputsCheckboxesRadios.initComponents();
+        });
+    </script>
+   
+    <script src="~/assets/js/jquery.validate.min.js"></script>
+    <script src="~/assets/js/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+        function begin()
+        {
+            $('#userMsj').empty();
+            var dark = $("#newUserForm");
+            $(dark).block({
+                    message: '<i class="icon-spinner spinner"></i> İşleminiz Yapılıyor...',
+                    overlayCSS: {
+                        backgroundColor: '#fff',
+                        opacity: 0.8,
+                        cursor: 'wait'
+                },
+                css: {
+                    border: 0,
+                    padding: 0,
+                    backgroundColor: 'none'
+                }
+            });
+        }
+        function success(result)
+        {
+            var light = $("#newUserForm");
+            var msjStartText = "";
+            $(light).unblock();
+            if (result.AlertType === "success") {
+                msjStartText = "Onay! ";
+            }
+            if (result.AlertType === "info") {
+                msjStartText = "Bilgi! ";
+            }
+            if (result.AlertType === "warning") {
+                msjStartText = "Uyarı! ";
+            }
+            if (result.AlertType === "danger") {
+                msjStartText = "Hata! ";
+            } 
+            $("#userMsj").append("<div class='alert alert-" + result.AlertType + " alert-styled-left alert-dismissible'> <span class='font-weight-semibold'>" + msjStartText + "</span>" + result.ReturnMessage + "</div>");
+
+        }
+        function complete(result) {
+            var light = $("#newUserForm");
+            $(light).unblock();
+        }
+        function failure(result) {
+            var light = $("#newUserForm");
+            $(light).unblock();
+            $('#userMsj').empty();
+            $("#userMsj").append("<div class='alert alert-danger alert-styled-left alert-dismissible'> <span class='font-weight-semibold'>Hata! </span> İşlem Sırasında Hata alındı. " + result.ReturnMessage + "</div>");
+        }
+    </script>
+}
+        <div class="card" id="newUserForm">
+            <div class="card-header bg-white header-elements-inline">
+                <h5 class="card-title"><strong>Yeni Kullanıcı Bilgileri</strong></h5>
+            </div>
+            <div class="card-body">
+                @*@using (Html.BeginForm("NewUser", "Account", FormMethod.Post))
+                {*@
+                @using (Ajax.BeginForm("NewUser", "Account",
+                    new AjaxOptions
+                    {
+                        HttpMethod = "POST",
+                        OnBegin = "begin",
+                        OnSuccess = "success",
+                        OnComplete = "complete",
+                        OnFailure = "failure"
+
+                    }))
+                {
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                     @Html.AntiForgeryToken()
+                         <div class="form-group row">
+                             <label class="col-lg-3 col-form-label">Kullanıcı Adı:</label>
+                             <div class="col-lg-9">
+                                 @Html.TextBoxFor(x => x.UserInfoDto.User.UserName, new { @placeholder = "Kullanıcı Adı", @class = "form-control",@name= "UserName",@id= "UserName" })
+                                 @Html.ValidationMessageFor(model => model.UserInfoDto.User.UserName, "", new { @class = "form-text text-danger" })
+                             </div>
+                         </div>
+                         <div class="form-group row">
+                             <label class="col-lg-3 col-form-label">Adı:</label>
+                             <div class="col-lg-9">
+                                 @Html.TextBoxFor(x => x.UserInfoDto.User.FirstName, new { @placeholder = "Adı", @class = "form-control" })
+                                 @Html.ValidationMessageFor(model => model.UserInfoDto.User.FirstName, "", new { @class = "text-danger" })
+                             </div>
+                         </div>
+                         <div class="form-group row">
+                             <label class="col-lg-3 col-form-label">Soyadı:</label>
+                             <div class="col-lg-9">
+                                 @Html.TextBoxFor(x => x.UserInfoDto.User.LastName, new { @placeholder = "Soyadı", @class = "form-control" })
+                                 @Html.ValidationMessageFor(model => model.UserInfoDto.User.LastName, "", new { @class = "text-danger" })
+                             </div>
+                         </div>
+                         <div class="form-group row">
+                             <label class="col-lg-3 col-form-label">E-Posta:</label>
+                             <div class="col-lg-9">
+                                 @Html.TextBoxFor(x => x.UserInfoDto.User.Email, new { @placeholder = "E-Posta", @class = "form-control" })
+                                 @Html.ValidationMessageFor(model => model.UserInfoDto.User.Email, "", new { @class = "text-danger" })
+                             </div>
+                         </div>
+                         <div class="form-group row">
+                             <label class="col-lg-3 col-form-label">Şifre:</label>
+                             <div class="col-lg-9">
+                                 @Html.TextBoxFor(x => x.UserInfoDto.Password.PasswordHash, new { @placeholder = "Şifre", @class = "form-control" })
+                                 @Html.ValidationMessageFor(model => model.UserInfoDto.Password.PasswordHash, "", new { @class = "text-danger" })
+                             </div>
+                         </div>
+                         <div class="form-group row">
+                             <label class="col-lg-3 col-form-label">Şifre (Tekrar):</label>
+                             <div class="col-lg-9">
+                                 @Html.TextBoxFor(x => x.UserInfoDto.Password.RePassword, new { @placeholder = "Tekrar Şifre", @class = "form-control" })
+                                 @Html.ValidationMessageFor(model => model.UserInfoDto.Password.RePassword, "", new { @class = "text-danger" })
+                             </div>
+                         </div>
+                        <div class="text-right">
+                         <button type="submit" class="btn btn-primary">Kaydet</button>
+                     </div>
+                }
+
+            </div>
+        </div>
+
+
+
+

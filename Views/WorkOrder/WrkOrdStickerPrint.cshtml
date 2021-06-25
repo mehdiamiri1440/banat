@@ -1,0 +1,84 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.WorkOrder.StickerPrintViewModel
+@using System.Web.Optimization
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>OrderPrintForm</title>
+    @Styles.Render("~/bundle/GlobalStylesheets")
+    <style>
+        body {
+            width: 29.7cm;
+            height: 20cm;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <table class="table table-xs table-bordered font-size-xs" style=" width: 400px" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+        <tbody>
+            <tr>
+                <td class="font-weight-black">Ürün Kodu</td>
+                <td colspan="2">@Model.SemiProductCode</td>
+
+            </tr>
+            <tr>
+                <td class="font-weight-black">Ürün Adı</td>
+                <td colspan="2">@Model.SemiProductName</td>
+            </tr>
+            <tr>
+                <td class="font-weight-black">Lot</td>
+                <td>@Model.WorkOrderId</td>
+                <td rowspan="6">
+                    <img src="/WorkOrder/CreateBarcode?wrkOrdId=@Model.StickerCode" width="100" height="120" />
+                </td>
+            </tr>
+            <tr>
+                <td class="font-weight-black">Vardiya</td>
+                <td>@Model.ShiftName</td>
+
+            </tr>
+            <tr>
+                <td class="font-weight-black">Makina</td>
+                <td>@Model.MachineName</td>
+            </tr>
+            <tr>
+                <td class="font-weight-black">Tarih</td>
+                <td>@Model.Date.ToString("dd/MM/yyyy")</td>
+            </tr>
+            <tr>
+                <td class="font-weight-black">Operatör</td>
+                <td>@Model.EmployeeName</td>
+            </tr>
+            <tr>
+                <td class="font-weight-black">Op.Kodu</td>
+                <td>@Model.EmployeeId</td>
+            </tr>
+            <tr>
+                <td class="font-weight-black">KG</td>
+                <td>@Model.SemiProducWeight</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="font-weight-black">Adet</td>
+                <td>@Model.SemiProductAmount</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td class="font-weight-black">Etiket No</td>
+                <td>@Model.StickerId</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

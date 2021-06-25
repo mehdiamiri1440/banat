@@ -1,0 +1,299 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.WorkOrder.CreateStickerViewModel
+@{
+    ViewBag.Title = "CreateSticker";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+@using (Html.BeginForm("CreateSticker", "WorkOrder", FormMethod.Post))
+{
+
+    <div class="card">
+        <div class="card-header header-elements-inline">
+            <h6 class="card-title">İş Emri Oluştur</h6>
+        </div>
+        <div class="card-body">
+            <div class="form-group row">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">İş emri no:</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.WorkOrderProductId, new { @placeholder = "İş Emri No", @class = "form-control", disabled = "disabled" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Personel Adı:</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.EmployeeName, new { @placeholder = "Personel Adı", @class = "form-control", disabled = "disabled" })
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="form-group row">
+                <div class="col-lg-6">
+                    @*<div class="row">
+                    <label class="col-md-3 col-form-label">Yarımamul:</label>
+                    <div class="col-md-9">
+                        @Html.HiddenFor(x => Model.SelectedWorkOrderProductId)
+                        @Html.DropDownListFor(x => x.SelectedSemiProduct, new SelectList(Model.WorkOrderProductListDto.WorkOrderProducts, "IdAmoundCombine", "SemiProductName"), new { @class = "form-control select-access-value" })
+                    </div>
+                </div>*@
+
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Yarımamul:</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.SemiProductName, new { @class = "form-control", disabled = "disabled" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="row">
+
+                        <label class="col-md-3 col-form-label">Üretilen Miktar:</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.Amount, new { @placeholder = "Üretilen Miktar", @class = "form-control", disabled = "disabled" })
+                        </div>
+
+
+                    </div>
+                    @if (Model.Weight > 0)
+                    {
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Üretilen Ağırlık:</label>
+                            <div class="col-md-9">
+                                @Html.TextBoxFor(x => x.Weight, new { @placeholder = "Üretilen Ağırlık", @class = "form-control", disabled = "disabled" })
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-lg-6">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Miktar olarak kasa kapasitesi</label>
+                        <div class="col-md-3">
+                            @Html.TextBoxFor(x => x.StickerAmount, new { @placeholder = "Miktar", @class = "form-control" })
+                        </div>
+                    </div>
+
+
+                    @if (Model.Weight > 0)
+                    {
+                        <div class="row">
+                            <label class="col-md-3 col-form-label">Ağırlık olarak kasa kapasitesi</label>
+                            <div class="col-md-3">
+                                @Html.HiddenFor(x => x.AmountWeightRate)
+                                @Html.TextBoxFor(x => x.StickerWeight, new { @placeholder = "Ağırlık", @class = "form-control" })
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Manuel Etiket</label>
+                        <div class="col-md-3">
+                            @Html.TextBoxFor(x => x.StickerPiece, new { @placeholder = "Manuel Etiket Adedi ", @class = "form-control", disabled = "disabled" })
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    @Html.CheckBoxFor(x => x.ManuelCreateSticker, new { @class = "form-check-input-styled", @name = "ManuelCreateSticker", @id = "ManuelCreateSticker" })
+                                    Manuel Etiket Üretmek İstiyorum
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row mb-0">
+                <div class="col-lg-10 ml-lg-auto text-right">
+                    <button type="button" class="btn btn-primary col-md-2" id="createSticker"><i class="icon-stack font-size-base mr-2"></i>Etiket Oluştur</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card" id="workorderlist">
+        <div class="card-header bg-white header-elements-inline">
+            <h5 class="card-title"><strong>Etiketler</strong></h5>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table datatable-basic" id="StickerList">
+                <thead>
+                    <tr>
+                        <th>Etiket Id</th>
+                        <th>Miktar</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.Stickers)
+                    {
+                        <tr>
+                            @Html.HiddenFor(x => item.Id)
+                            <td>@item.Id</td>
+                            <td>@item.Amound</td>  
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+}
+
+@section PageScripts{
+    <script>
+        var model = @Html.Raw(Json.Encode(Model));
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            $.extend($.fn.dataTable.defaults, {
+                columnDefs: [{
+                    orderable: false,
+                    width: 100
+                }],
+
+            });
+            $('.form-check-input-styled').uniform();
+            $('#StickerList').DataTable({
+                "language": {
+                    "url": "/Scripts/dil.json"
+                }
+            });
+
+
+            $('#ManuelCreateSticker').click(function () {
+
+                if (this.checked) {
+                    $('#StickerPiece').removeAttr("disabled");
+                }
+                else {
+                    $('#StickerPiece').prop('disabled', 'disabled');
+                }
+
+            });
+
+            $('#createSticker').click(function () {
+                
+                showloading("Etiket Hazırlanıyor");
+                if ($('#ManuelCreateSticker').is(":checked") === false) {
+                    
+                    var workOrderId = $('#WorkOrderId').val();
+                    var workOrderProductId = $('#WorkOrderProductId').val();
+                    var amount = $('#Amount').val();
+                    var stickerAmount = $('#StickerAmount').val();
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/WorkOrder/CreateStickerOto",
+                        contentType: "application/json; charset=utf-8",
+                        data: {
+                            workOrderProductId: workOrderProductId,
+                            amount: amount,
+                            stickerAmount: stickerAmount
+                        },
+                        success: function (data, status) {
+                            endloading();
+                            var docName = data.fileName;
+                            swal({
+                                title: 'Onay',
+                                text: "Etiket Başarıyla Üretildi.",
+                                type: 'success',
+                                showCancelButton: false,
+                                buttonsStyling: false,
+                                confirmButtonClass: 'btn btn-primary',
+                                confirmButtonText: 'Tamam',
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.value) {
+                                    console.log('Tamam Butonuna Basıldı');
+                                    var url = '@Url.Action("GeneratePDF", "WorkOrder")?fileName=' + docName;
+                                    window.open(url, "_blank");
+                                    location.reload();
+                                }
+                            });
+
+                        },
+                        error: function (data, status) {
+                            alert('error')
+                        }
+                    })
+                }
+                else {
+                    showloading("Etiket Hazırlanıyor");
+                    var workOrderId = $('#WorkOrderId').val();
+                    var workOrderProductId = $('#WorkOrderProductId').val();
+                    var stickerPiece = $('#StickerPiece').val();
+                    var stickerAmount = $('#StickerAmount').val();
+                   
+                    $.ajax({
+                        type: "GET",
+                        url: "/WorkOrder/CreateStickerManuel",
+                        contentType: "application/json; charset=utf-8",
+                        data: {
+                            workOrderProductId: workOrderProductId,
+                            stickerPiece: stickerPiece,
+                            stickerAmount: stickerAmount
+                        },
+                        success: function (data, status) {
+                            var docName = data.fileName;
+                            endloading();
+                            swal({
+                                title: 'Onay',
+                                text: "Etiket Başarıyla Üretildi.",
+                                type: 'success',
+                                showCancelButton: false,
+                                buttonsStyling: false,
+                                confirmButtonClass: 'btn btn-primary',
+                                confirmButtonText: 'Tamam',
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.value) {
+                                    console.log('Tamam Butonuna Basıldı');
+                                    var url = '@Url.Action("GeneratePDF", "WorkOrder")?fileName=' + docName;
+                                    window.open(url, "_blank");
+                                    location.reload();
+                                }
+                            });
+                        },
+                        error: function (data, status) {
+                            endloading();
+                            swal({
+                                buttonsStyling: false,
+                                title: 'Hata',
+                                text: 'Hatal Oluştu. Sistem Yöneticisine İletiniz.',
+                                type: 'error',
+                                confirmButtonClass: 'btn btn-primary',
+                            });
+                        }
+                    });
+                }
+
+
+            });
+
+            $('#SelectedSemiProduct').change(function () {
+                var selectedData = $('#SelectedSemiProduct').val();
+                var dataList = selectedData.split("|");
+
+                $('#SelectedWorkOrderProductId').val(dataList[0]);
+                $('#Amount').val(dataList[1]);
+            });
+
+            $("#StickerWeight").on('focusout', function () {
+                //var rate = $("#AmountWeightRate").val();
+                var amount = parseFloat($('#AmountWeightRate').val().toString().replace(',', '.')) * parseFloat($('#StickerWeight').val().toString().replace(',', '.'))
+                $("#StickerAmount").val(Math.round(amount));           
+            });
+        })
+    </script>
+}

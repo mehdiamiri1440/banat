@@ -1,0 +1,256 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Customer.CorporateCustomerAddViewModel
+@{
+    ViewBag.Title = "Kurumsal Müşteri Tanımlama";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+
+@section PageScripts
+{
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/assets/js/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(".DataForm").submit(function (E) {
+                var formm = $(this);
+                if (formm.valid()) {
+                    $.blockUI({
+                        message: '<i class="icon-spinner4 spinner" style="font-size:20px"></i><span style="font-size:20px">  İşlem Yapılıyor...</span>',
+                        overlayCSS: {
+                            backgroundColor: '#1b2024',
+                            opacity: 0.8,
+                            zIndex: 1200,
+                            cursor: 'wait'
+                        },
+                        css: {
+                            border: 0,
+                            color: '#fff',
+                            padding: 0,
+                            zIndex: 1201,
+                            backgroundColor: 'transparent'
+                        },
+                    });
+                }
+            });
+
+            $("#Countries").change(function () {
+
+                var cId = $('#Countries').val();
+                $('#Cities').empty();
+                $.ajax({
+                    type: 'GET',
+                    url: '/City/CityList',
+                    data: { countryId: cId },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: successFunc,
+                    error: errorFunc
+                });
+
+                function successFunc(result, status) {
+                    var jsonData = JSON.parse(result.ResultValue);
+                    $('#Cities').append('<option>Seçiniz</option>');
+                    for (var i = 0; i < jsonData.length; i++) {
+                        var users = jsonData[i];
+                        console.log(users.DistrictName);
+                        $('#Cities').append(new Option(users.CityName, users.Id));
+                        $("#Cities").prop("disabled", false);
+                    }
+
+                }
+
+                function errorFunc() {
+                    alert('error');
+                }
+            });
+            $("#Cities").change(function () {
+
+                var cId = $('#Cities').val();
+                $('#Districts').empty();
+                $.ajax({
+                    type: 'GET',
+                    url: '/City/DistrictList',
+                    data: { cityId: cId },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: successFunc,
+                    error: errorFunc
+                });
+
+                function successFunc(result, status) {
+                    var jsonData = JSON.parse(result.ResultValue);
+                    $('#Districts').append('<option>Seçiniz</option>');
+                    for (var i = 0; i < jsonData.length; i++) {
+                        var users = jsonData[i];
+                        console.log(users.DistrictName);
+                        $('#Districts').append(new Option(users.DistrictName, users.Id));
+                        $("#Districts").prop("disabled", false);
+                    }
+
+                }
+
+                function errorFunc() {
+                    alert('error');
+                }
+            });
+        });
+
+    </script>
+    
+    <script src="~/Assets/js/Customer/AddCorporateCustomerServiceResult.js"></script>
+}
+
+
+
+<div class="card" id="newCorparateCustomerForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Yeni Müşteri Tanımlama</strong></h5>
+    </div>
+    <div class="card-body">
+        @using (Ajax.BeginForm("AddCorporateCustomer", "Customer",
+                      new AjaxOptions
+                      {
+                          HttpMethod = "POST",
+                          OnBegin = "begin",
+                          OnSuccess = "success",
+                          OnComplete = "complete",
+                          OnFailure = "failure"
+
+                      }))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.AntiForgeryToken()
+            @*@using (Html.BeginForm("AddCorporateCustomer", "Customer", FormMethod.Post, new { @id = "AddCorporateCustomerForm", @class = "DataForm" }))
+            {*@
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Müşteri No</label>
+                        @Html.TextBoxFor(x => x.CustomerNo, new { @class = "form-control", @placeholder = "Müşteri No", disabled = "disabled" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Firma Adı</label>
+                        @Html.TextBoxFor(x => x.CompanyName, new { @class = "form-control", @placeholder = "Firma Adı", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Vergi Dairesi</label>
+                        @Html.TextBoxFor(x => x.TaxAdministration, new { @class = "form-control", @placeholder = "Vergi Dairesi", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.TaxAdministration, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Vergi No</label>
+                        @Html.TextBoxFor(x => x.TaxNo, new { @class = "form-control", @placeholder = "Vergi No", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.TaxNo, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Telefon No-1</label>
+                        @Html.TextBoxFor(x => x.TelNo, new { @class = "form-control", @placeholder = "Telefon Numarası", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.TelNo, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Telefon No-2</label>
+                        @Html.TextBoxFor(x => x.TelNo2, new { @class = "form-control", @placeholder = "2.Telefon Numarası", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.TelNo2, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Fax</label>
+                        @Html.TextBoxFor(x => x.Fax, new { @class = "form-control", @placeholder = "Fax", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.Fax, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Eposta Adresi</label>
+                        @Html.TextBoxFor(x => x.EPosta, new { @class = "form-control", @placeholder = "Firma E-Posta Adresi", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.EPosta, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>WebSitesi</label>
+                        @Html.TextBoxFor(x => x.WebSite, new { @class = "form-control", @placeholder = "Firma Web Sitesi", autocomplete = "off" })
+                        @Html.ValidationMessageFor(model => model.WebSite, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Yetkili Adı</label>
+                        @Html.TextBoxFor(x => x.CompanyManagerName, new { @class = "form-control", @placeholder = "Yetkili Adı", autocomplete = "off" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Yetkili SoyAdı</label>
+                        @Html.TextBoxFor(x => x.CompanyManagerSurName, new { @class = "form-control", @placeholder = "Yetkili Soyadı", autocomplete = "off" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Yetkili Telefonu</label>
+                        @Html.TextBoxFor(x => x.CompanyManagerTelephone, new { @class = "form-control", @placeholder = "Yetkili Telefonu", autocomplete = "off" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Yetkili Email</label>
+                        @Html.TextBoxFor(x => x.CompanyManagerEmail, new { @class = "form-control", @placeholder = "Yetkili Email", autocomplete = "off" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Ülke</label>
+                        @Html.DropDownListFor(m => m.CountryId, new SelectList(Model.Countries, "Id", "CountryName"), "Seçiniz",
+                      new { @class = "form-control", @id = "Countries", @name = "Countries" })
+                        @Html.ValidationMessageFor(model => model.CountryId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>İl</label>
+                        @Html.DropDownListFor(m => m.CityId, new SelectList(Model.Cities, "Id", "CityName"), "Seçiniz",
+                 new { @class = "form-control", @id = "Cities", @name = "Cities" })
+                        @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>İlçe</label>
+                        @Html.DropDownListFor(x => x.DistrictId, Enumerable.Empty<SelectListItem>(), "Seçiniz", new { @class = "form-control", @id = "Districts", @name = "Districts", @disabled = "disabled" })
+                        @Html.ValidationMessageFor(model => model.DistrictId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Adres Detay</label>
+                        @Html.TextBoxFor(x => x.CompanyAddress, new { @class = "form-control", @placeholder = "Adres Detay", autocomplete = "off" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+        }
+    </div>
+</div>

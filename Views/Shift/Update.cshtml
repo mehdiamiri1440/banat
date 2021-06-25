@@ -1,0 +1,46 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Shift.ShiftUpdateViewModel
+@{
+    ViewBag.Title = "Update";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newMachineForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Vardiya Güncelleme Sayfası</strong></h5>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("Update", "Shift", FormMethod.Post))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="Type">Adı</label>
+                @Html.TextBoxFor(x => x.Shift.Name, new { @class = "form-control", @placeholder = "Adı" })
+                @Html.HiddenFor(x => x.Shift.Id)
+            </div>
+
+            <div class="form-group">
+                <label for="Type">Başlangıç Saati</label>
+                @Html.TextBoxFor(x => x.Shift.StartTime, new { @class = "form-control", @placeholder = "Başlangıç Saati" })
+            </div>
+
+            <div class="form-group">
+                <label for="Type">Bitiş Saati</label>
+                @Html.TextBoxFor(x => x.Shift.FinishTime, new { @class = "form-control", @placeholder = "Bitiş Saati" })
+            </div>
+
+            <div class="form-group">
+                <label for="Type">Durum Kodu</label>
+                @Html.TextBoxFor(x => x.Shift.Status, new { @class = "form-control", @placeholder = "Durum Kodu" })
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+
+        }
+    </div>
+</div>
+
+

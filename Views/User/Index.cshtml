@@ -1,0 +1,149 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+
+
+@section PageStyle
+{
+    <link href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
+     
+}
+
+@section PageScripts
+{
+    <script src="~/Scripts/jquery.dataTables.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $.extend($.fn.dataTableExt.oSort, {
+                "turkish-pre": function (a) {
+                    var special_letters = {
+                        "C": "Ca", "c": "ca", "Ç": "Cb", "ç": "cb",
+                        "G": "Ga", "g": "ga", "Ğ": "Gb", "ğ": "gb",
+                        "I": "Ia", "ı": "ia", "İ": "Ib", "i": "ib",
+                        "O": "Oa", "o": "oa", "Ö": "Ob", "ö": "ob",
+                        "S": "Sa", "s": "sa", "Ş": "Sb", "ş": "sb",
+                        "U": "Ua", "u": "ua", "Ü": "Ub", "ü": "ub"
+                    };
+                    for (var val in special_letters)
+                        a = a.split(val).join(special_letters[val]).toLowerCase();
+                    return a;
+                },
+
+                "turkish-asc": function (a, b) {
+                    return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+                },
+
+                "turkish-desc": function (a, b) {
+                    return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+                }
+            });
+
+
+                $('#tblUserList').DataTable({
+                    "ajax": {
+                        'aoColumns': [
+                            { 'sType': 'turkish' },
+                            { 'sType': 'string' }
+                        ],
+                        "url": "/User/GetList",
+                        "type": "POST",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        { "data": "UserName", "name": "UserName" },
+                        { "data": "FirstName", "name": "FirstName" },
+                        { "data": "LastName", "name": "LastName" },
+                        { "data": "FirstName", "name": "FirstName" },
+                        { "data": "LastName", "name": "LastName" },
+                        { "data": "Email", "name": "Email" },
+                        { "data": "Email", "name": "Email" },
+                        { "data": "Email", "name": "Email" },
+                        { "data": "Email", "name": "Email" },
+                        { "data": "Email", "name": "Email" },
+                        {
+                            "title": "Rol Atama",
+                            "data": "Id",
+                            "searchable": false,
+                            "sortable": false,
+                            "render": function (data, type, full, meta) {
+                                return '<div class="list-icons">' +
+                                            '<div class="dropdown">' +
+                                                '<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                                                    '<i class="icon-menu9"></i>' +
+                                                '</a>' +
+                                                    '<div class="dropdown-menu dropdown-menu-right" x-placement="top-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(22px, 1px, 0px);">' +
+                                                        '<a href="@Url.Action("RoleUpdate", "User")?userId=' + data + '" class="dropdown-item"><i class="icon-pencil"></i> Güncelle</a>' +
+                                                    '</div>' +
+                                            '</div>' +
+                                        '</div>';
+                            }
+                        }
+                    ],
+                    "serverSide": "true",
+                    "processing": "true",
+                    "order": [0, "asc"],
+                    "language": {
+                        "url": "/Scripts/dil.json"
+                    }
+                   
+            });
+                
+               
+                
+            });
+
+
+
+    </script>
+}
+
+<div class="card" id="userList">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Kullanıcılar</strong></h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="tblUserList">
+                <thead>
+                    <tr>
+                        <th>Kullanıcı Adı</th>
+                        <th>Adı</th>
+                        <th>Soyadı</th>
+                        <th>Adı</th>
+                        <th>Soyadı</th>
+                        <th>Email</th>
+                        <th>Email</th>
+                        <th>Email</th>
+                        <th>Email</th>
+                        <th>Email</th>
+                        <th>İşlemler</th>
+
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Kullanıcı Adı</th>
+                        <th>Adı</th>
+                        <th>Soyadı</th>
+                        <th>Adı</th>
+                        <th>Soyadı</th>
+                        <th>Email</th>
+                        <th>Email</th>
+                        <th>Email</th>
+                        <th>Email</th>
+                        <th>Email</th>
+                        <th>İşlemler</th>
+
+                    </tr>
+                </tfoot>
+            </table>
+
+        </div>
+
+    </div>
+</div>

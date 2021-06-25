@@ -1,0 +1,41 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Employee.EmployeeUpdateViewModel
+@{
+    ViewBag.Title = "Update";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newEmployeeForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Personel Güncelleme Sayfası</strong></h5>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("Update", "Employee", FormMethod.Post))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            <label for="Type">Adı</label>
+            @Html.TextBoxFor(x => x.Employee.Name, new { @class = "form-control", @placeholder = "Adı" })
+            @Html.HiddenFor(x => x.Employee.Id)
+        </div>
+
+            <div class="form-group">
+                <label for="Type">Soyadı</label>
+                @Html.TextBoxFor(x => x.Employee.Surname, new { @class = "form-control", @placeholder = "Soyadı" })
+            </div>
+
+            <div class="form-group">
+                <label for="Type">Durumu</label>
+                @Html.TextBoxFor(x => x.Employee.Status, new { @class = "form-control", @placeholder = "Durumu" })
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+
+        }
+    </div>
+</div>
+
+

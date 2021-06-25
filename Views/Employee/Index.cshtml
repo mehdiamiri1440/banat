@@ -1,0 +1,39 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Employee.EmployeeListViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newRoleForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Sisteme Kayıtlı Personeller</strong></h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-responsive table-striped">
+            <tr>
+                <th>Id</th>
+                <th>Adı</th>
+                <th>Soyadı</th>
+                <th>Durumu</th>
+                <th></th>
+                <th></th>
+            </tr>
+            @foreach (var item in Model.PersonelListesi)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>@item.Surname</td>
+                    <td>@item.Status</td>
+                    <td><a href="/Employee/Delete?EmployeeId=@item.Id" class="btn-sm btn-danger"><i class="fa fa-edit"></i> Sil </a></td>
+                    <td><a href="/Employee/Update?EmployeeId=@item.Id" class="btn-sm btn-success"><i class="fa fa-edit"></i> Güncelle </a></td>
+                </tr>
+            }
+        </table>
+
+        <a href="/Employee/Add" class="btn btn-success">Yeni Makine Ekle</a>
+
+    </div>
+
+</div>

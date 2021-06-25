@@ -1,0 +1,87 @@
+﻿@using Ginosis.Banat.MvcWebUI.Helpers
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+
+
+@section PageScripts
+{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+        function begin()
+        {
+            var light = $("#customerForm");
+            $(light).block({
+                message: '<i class="icon-spinner spinner"></i> İşleminiz Yapılıyor',
+                overlayCSS: {
+                    backgroundColor: '#fff',
+                    opacity: 0.8,
+                    cursor: 'wait'
+                },
+                css: {
+                    border: 0,
+                    padding: 0,
+                    backgroundColor: 'none'
+                }
+            });
+         }
+        function success(result)
+        {
+            var light = $("#customerForm");
+            var jsonData = JSON.parse(result.ResultValue);
+            for (var i = 0; i < jsonData.length; i++) {
+                var users = jsonData[i];
+                console.log(users.UserName);
+            }
+            $(light).unblock();
+            $("#userMsj").append("<div class='alert bg-success text-white alert-styled-left alert-dismissible'> <span class='font-weight-semibold'>Onay! </span>" + result.ReturnMessage + "</div>");
+        }
+        function complete(result) {
+            var light = $("#customerForm");
+            $(light).unblock();
+        }
+        function failure(result) {
+            var light = $("#customerForm");
+            $(light).unblock();
+            $("#userMsj").append("<p>İşlem Hatalı...</p>");
+        }
+    </script>
+}
+
+
+
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card card-body border-top-info text-center" style="zoom: 1;" id="customerForm">
+            <h6 class="mb-0 font-weight-semibold">Content loading spinner 1</h6>
+            <p class="mb-3 text-muted">Using <code>icon-spinner spinner</code> classes</p>
+        @using (Ajax.BeginForm("GetData", "DashBoard",
+                new AjaxOptions
+                {
+                    OnBegin = "begin",
+                    OnSuccess = "success",
+                    OnComplete = "complete",
+                    OnFailure = "failure"
+
+                }))
+        {
+            
+            <div>
+                <button type="submit" class="btn bg-teal-400 ml-2" id="spinner-dark">
+                    <i class="icon-spinner spinner mr-2"></i>
+                    Kaydet
+                </button>
+            </div>
+        }
+        </div>
+    </div>
+</div>
+
+
+
+
+

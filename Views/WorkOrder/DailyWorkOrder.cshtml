@@ -1,0 +1,537 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.WorkOrder.WorkOrderIndexViewModel
+@{
+    ViewBag.Title = "DailyWorkOrder";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+@using (Html.BeginForm("DailyWorkOrder", "WorkOrder", FormMethod.Post, new { @id = "frmDailyWorkOrder" }))
+{
+
+
+    <div class="card">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="card-body">
+               @*     @Html.TextBoxFor(x => x.WorkOrderDate, new { @placeholder = "Tarih", @class = "form-control dpicker", @name = "WorkOrderDate", @id = "WorkOrderDate", @autocomplete = "off" })*@
+                </div>
+            </div>
+            <div class="col-lg-10">
+
+                <div class="text-right">
+                    
+                    <div class="card-body">
+                       
+                        <div class="btn-group">
+                            @Html.TextBoxFor(x => x.WorkOrderDate, new { @placeholder = "Tarih", @class = "form-control dpicker", @name = "WorkOrderDate", @id = "WorkOrderDate", @autocomplete = "off" })
+                            <button type="button" id="allShift" class="@(Model.SelectedShiftId==0 ?  "btn btn-danger": "btn btn-outline-danger" )" role="button">Tüm Vardiyalar</button>
+                            <button type="button" id="shiftFirst" class="@(Model.SelectedShiftId==1 ? "btn btn-danger": "btn btn-outline-danger")" role="button">Sabah Vardiyası</button>
+                            <button type="button" id="shiftSecond" class="@(Model.SelectedShiftId==2 ? "btn btn-danger": "btn btn-outline-danger")" role="button">Gündüz Vardiyası</button>
+                            <button type="button" id="shiftThird" href="DailyWorkOrder?shiftId=3" class="@(Model.SelectedShiftId==3 ? "btn btn-danger": "btn btn-outline-danger")" role="button">Gece Vardiyası</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="card" id="workorderlist">
+        <div class="card-header bg-white header-elements-inline">
+            <h5 class="card-title"><strong>Görevler</strong></h5>
+        </div>
+        <div class="card-body">
+
+            <table class="table datatable-basic" id="WorkOrderList">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Makina</th>
+                        <th>Vardiya</th>
+                        <th>Üretilecek Tarih</th>
+                        <th>Personel</th>
+                        <th>Üretilecek Mamul</th>
+                        <th>Üretilecek Miktar</th>
+                        <th>Üretilen Miktar</th>
+                        <th>Üretilen Kilo</th>
+                        @*<th>Fire Tipi</th>*@
+                        <th>Fire</th>
+                        <th>Duraklama</th>
+                        @*<th>Duruş Zamanı(dk)</th>*@
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @for (int y = 0; y < Model.WorkOrderListDtos.Count; y++)
+                    {
+                        <tr>
+                            @Html.HiddenFor(x => Model.WorkOrderListDtos[y].WorkOrderId)
+                            @Html.HiddenFor(x => Model.WorkOrderListDtos[y].WorkOrderProductId)
+                            <td>@Model.WorkOrderListDtos[y].WorkOrderId</td>
+                            <td>@Model.WorkOrderListDtos[y].MachineCode-@Model.WorkOrderListDtos[y].MachineName</td>
+                            <td>@Model.WorkOrderListDtos[y].ShiftName</td>
+                            <td>@Model.WorkOrderListDtos[y].PlannedDate.Value.ToString("dd/MM/yyyy")</td>
+                            <td>
+
+                                @Html.DropDownListFor(m => Model.WorkOrderListDtos[y].EmployeeId, new SelectList(Model.Employees, "Id", "DisplayName", Model.WorkOrderListDtos[y].EmployeeId),
+                                    new { @class = "form-control select-search", @id = "WorkOrderListDtos[" + y + "]_EmployeeId", @name = "WorkOrderListDtos[" + y + "]_EmployeeId" })
+                            </td>
+                            <td>
+                                @Html.HiddenFor(x => Model.WorkOrderListDtos[y].WorkOrderProductId)
+                                @string.Format("{0} - {1}", @Model.WorkOrderListDtos[y].SemiProductName,Model.WorkOrderListDtos[y].SemiProductCode)
+                            </td>
+                            <td>
+                                @Html.Label(Model.WorkOrderListDtos[y].PlannedAmount.ToString())
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(x => Model.WorkOrderListDtos[y].DailyCompletedAmount, new { @class = "form-control", @placeholder = "Miktar", @style = "width:75px" })
+                            </td>
+
+                            <td>
+                                @if (Model.WorkOrderListDtos[y].AmoundWeightRate > 0)
+                                {
+                                    var weightRate = Model.WorkOrderListDtos[y].AmoundWeightRate;
+                                    @Html.HiddenFor(x => Model.WorkOrderListDtos[y].AmoundWeightRate, new { @rate = "" })
+                                    @Html.TextBoxFor(x => Model.WorkOrderListDtos[y].DailyCompletedWeight, new { @class = "form-control", @placeholder = "Ağırlık", @completedweight = weightRate, @type = "number", @min = "0",@style="width:75px" })
+                                }
+                            </td>
+                            <td>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="mr-3">
+                                        <a href="#WasteModal" data-toggle="modal" data-wrkPrdId="@Model.WorkOrderListDtos[y].WorkOrderProductId" class="btn bg-teal-400 rounded-round btn-icon btn-sm">
+                                            <span class="letter-icon">@Model.WorkOrderListDtos[y].WasteAmount</span>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </td>
+                            @*<td>
+
+                                    @Html.DropDownListFor(m => Model.WorkOrderListDtos[y].WasteTypeId, new SelectList(Model.WasteTypes, "Id", "Description", Model.WorkOrderListDtos[y].WasteTypeId),
+                                        new { @class = "form-control select-search" })
+                                </td>
+                                <td>
+                                    @Html.TextBoxFor(x => Model.WorkOrderListDtos[y].WasteAmount, new { @class = "form-control", @placeholder = "Fire Miktarı" })
+                                </td>*@
+                            @*<td>
+
+                                    @Html.DropDownListFor(m => Model.WorkOrderListDtos[y].StopTypeId, new SelectList(Model.StopTypes, "Id", "Description", Model.WorkOrderListDtos[y].StopTypeId),
+                                        new { @class = "form-control select-search" })
+                                </td>
+                                <td>
+                                    @Html.TextBoxFor(x => Model.WorkOrderListDtos[y].StopTime, new { @class = "form-control", @placeholder = "Duruş Zamanı" })
+                                </td>*@
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="mr-3">
+                                        <a href="#StopTimeModal" data-toggle="modal" data-wrkPrdId="@Model.WorkOrderListDtos[y].WorkOrderProductId" class="btn bg-teal-400 rounded-round btn-icon btn-sm">
+                                            <span class="letter-icon">@Model.WorkOrderListDtos[y].StopTime</span>
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="list-icons">
+                                    <div class="dropdown">
+                                        <a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">
+                                            <i class="icon-menu9"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(22px, 19px, 0px);">
+                                            <a href="/WorkOrder/ViewWorkOrderDetail?workOrderProductId=@Model.WorkOrderListDtos[y].WorkOrderProductId" class="dropdown-item"><i class="icon-pencil"></i>Görüntüle</a>
+                                            <a href="/WorkOrder/CreateSticker?workOrderProductId=@Model.WorkOrderListDtos[y].WorkOrderProductId" class="dropdown-item"><i class="mi-alarm-on"></i>Etiket Üret</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+            <div class="text-right">
+                <button type="submit" class="btn bg-blue" id="update">Güncelle</button>
+            </div>
+        </div>
+
+        @*<div class="text-center btn btn-primary btn-lg btn-block">
+                <button type="submit" class="btn btn-primary">Güncelle</button>
+            </div>*@
+        @*<div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-outline bg-indigo-400 text-indigo-400 border-indigo-400"></button>
+            </div>*@
+
+    </div>
+
+
+}
+
+<div class="modal fade" id="WasteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="prdNameModalLabel">Fire İşlemleri</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6 class="font-weight-semibold">Yeni Ekle</h6>
+                <input type="hidden" id="WwrkOrdPrdId" />
+                <div class="row">
+                    <div class="col-3">
+                        @Html.DropDownListFor(m => m.SelectedWasteType, new SelectList(Model.WasteTypes, "Id", "Description"), "Seçiniz",
+    new { @class = "form-control  form-control-sm select-search", @id = "SelectedWasteType", @name = "SelectedWasteType", })
+                    </div>
+                    <div class="col-3"><input type="text" class="form-control form-control-sm" id="WasteAmountInput" name="WasteAmountInput" placeholder="Miktar"></div>
+                    <div class="col-3"><button type="button" class="btn btn-success btn-sm" id="addWasteAmountBtn">Ekle</button></div>
+                </div>
+                <hr>
+                <table class="table table-xs table-bordered" id="wasteAmountList">
+                    <thead>
+                        <tr>
+                            <th>Fire Tipi</th>
+                            <th>Miktar</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="StopTimeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="prdNameModalLabel">Duruş İşlemleri</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h6 class="font-weight-semibold">Yeni Duruş Miktarı </h6>
+                <input type="hidden" id="SwrkOrdPrdId" />
+                <div class="row">
+                    <div class="col-3">
+                        @Html.DropDownListFor(m => m.SelectedWasteType, new SelectList(Model.StopTypes, "Id", "Description"), "Seçiniz",
+                        new { @class = "form-control  form-control-sm select-search", @id = "SelectedStopType", @name = "SelectedStopType", })
+                    </div>
+                    <div class="col-3"><input type="text" class="form-control form-control-sm" id="StoppedAmountInput" name="StoppedAmountInput" placeholder="Miktar"></div>
+                    <div class="col-3"><button type="button" class="btn btn-success btn-sm" id="addStoppedTimeBtn">Ekle</button></div>
+                </div>
+                <hr>
+                <table class="table table-xs table-bordered" id="detail">
+                    <thead>
+                        <tr>
+                            <th>Duruş Tipi</th>
+                            <th>Duruş Zamanı</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section PageScripts{
+    <script>
+        var model = @Html.Raw(Json.Encode(Model));
+
+        window.addEventListener('DOMContentLoaded', (event) => {            
+
+            $.extend($.fn.dataTable.defaults, {
+                columnDefs: [{
+                    orderable: false,
+                    width: 100
+                }],
+
+            });
+            $('#WorkOrderList').DataTable({
+                "language": {
+                    "url": "/Scripts/dil.json"
+                },
+                "columnDefs":[
+                    { "targets": 0, "width": "0%", "visible": false, "searchable": false },
+                    { "targets": 1, "width": "15%", "visible": true, "searchable": false },
+                    { "targets": 4, "width": "20%", "visible": true, "searchable": false },
+                    { "targets": 5, "width": "30%", "visible": true, "searchable": false }
+                ]
+                
+            });
+            $('#wasteAmountList').DataTable({
+                "language": {
+                    "url": "/Scripts/dil.json"
+                },
+                searching: false,
+                paging: true,
+                "bInfo": false,
+                "bLengthChange": false
+            });
+            $('#detail').DataTable({
+                "language": {
+                    "url": "/Scripts/dil.json"
+                },
+                searching: false,
+                paging: true,
+                "bInfo": false,
+                "bLengthChange": false
+            });
+            
+
+            $('#WorkOrderDate').daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+
+
+            $("[completedweight]").on('focusout', function () {
+                $this = $(this);
+                var rate = $(this).attr("completedweight");
+                var result = $(this).val() * rate;
+                var id = $(this).attr("id");
+                var newId = id.replace("DailyCompletedWeight", "DailyCompletedAmount");
+                $("#" + newId).val(Math.round(result));
+            });
+
+
+            $('#addStoppedTimeBtn').click(function (e) {
+                //Duruş Modal Ekle
+                var _wrkPrdId = $('#SwrkOrdPrdId').val();
+                //alert(wrkPrdId);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/WorkOrder/AddStoppedTimeAmount',
+                    data: { wrkOrdPrdId: _wrkPrdId, amount: $('#StoppedAmountInput').val(), stoppedType: $('#SelectedStopType').val() },
+                    success: successStoppedFuncAmount,
+                    error: errorFuncAmount,
+                });
+            })
+
+
+            $('#addWasteAmountBtn').click(function (e) {
+                //Fire Modal Ekle
+                var _wrkPrdId = $('#WwrkOrdPrdId').val();
+                //alert(wrkPrdId);
+                $.ajax({
+                    type: 'POST',
+                    url: '/WorkOrder/AddWasteAmount',
+                    data: { wrkOrdPrdId: _wrkPrdId, amount: $('#WasteAmountInput').val(), wasteType: $('#SelectedWasteType').val() },
+                    success: successWasteFuncAmount,
+                    error: errorFuncAmount,
+                });
+            })
+            $('#StopTimeModal').on('show.bs.modal', function (e) {
+                //duruş modal açılış
+                var wrkPrdId = $(e.relatedTarget).data('wrkprdid');
+                $('#SwrkOrdPrdId').val(wrkPrdId);
+                getStopList(wrkPrdId);
+                //alert(wrkPrdId);
+            });
+            $('#WasteModal').on('show.bs.modal', function (e) {
+                //fire modal açılış
+                var wrkPrdId = $(e.relatedTarget).data('wrkprdid');
+                $('#WwrkOrdPrdId').val(wrkPrdId);
+                getWasteList(wrkPrdId);
+                //alert(wrkPrdId);
+            });
+            $('#StopTimeModal').on('hidden.bs.modal', function (e) {
+                location.reload();
+            })
+            $('#WasteModal').on('hidden.bs.modal', function (e) {
+                location.reload();
+            })
+
+
+            $('#allShift').click(function () {
+                var date = $('#WorkOrderDate').val();
+                var machine = $('#SelectedMachineId').val();
+                var shift = $('#SelectedShiftId').val();
+                var url = "/WorkOrder/DailyWorkOrder?date=" + date + "&shiftId=0";
+                window.location.href = url;
+            });
+            $('#shiftFirst').click(function () {
+                var date = $('#WorkOrderDate').val();
+                var machine = $('#SelectedMachineId').val();
+                var shift = $('#SelectedShiftId').val();
+                var url = "/WorkOrder/DailyWorkOrder?date=" + date + "&shiftId=1";
+                window.location.href = url;
+            });
+            $('#shiftSecond').click(function () {
+                var date = $('#WorkOrderDate').val();
+                var machine = $('#SelectedMachineId').val();
+                var shift = $('#SelectedShiftId').val();
+                var url = "/WorkOrder/DailyWorkOrder?date=" + date + "&shiftId=2";
+                window.location.href = url;
+            });
+            $('#shiftThird').click(function () {
+                var date = $('#WorkOrderDate').val();
+                var machine = $('#SelectedMachineId').val();
+                var shift = $('#SelectedShiftId').val();
+                var url = "/WorkOrder/DailyWorkOrder?date=" + date + "&shiftId=3";
+                window.location.href = url;
+            });
+
+            
+
+            function successWasteFuncAmount(data) {
+                 //ajax ile wrkOrdPrd için girilmiş WasteAmount Listesi çeklilecek. modal içindeki table a basılacak. Bu liste getirme işi aynı zamanda modal açılışlarında da kullanılacak
+                var table = $('#wasteAmountList').DataTable();
+                table.clear().draw();
+                for (var i = 0; i < data.data.length; i++) {
+
+                    table.row.add([data.data[i].TypeName, data.data[i].Value,
+                        ' <a onClick="RemoveWaste(' + data.data[i].Id + '); return false;" title="Sil"><i class="icon-cross2 text-danger"></i>Sil</a>'
+                    ])
+                        .draw()
+                        .node();
+
+                }
+            }
+            function successStoppedFuncAmount(data) {
+                var table = $('#detail').DataTable();
+                table.clear().draw();
+                for (var i = 0; i < data.data.length; i++) {
+
+                    table.row.add([data.data[i].TypeName, data.data[i].Value,
+                        ' <a onClick="RemoveStop(' + data.data[i].Id + '); return false;" title="Sil"><i class="icon-cross2 text-danger"></i>Sil</a>'
+                    ])
+                        .draw()
+                        .node();
+
+                }
+            }
+            function errorFuncAmount() {
+                alert('işlem hatalı');
+            }
+
+            function getWasteList(id) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/WorkOrder/WasteList',
+                    data: { wrkOrdPrdId: id},
+                    success: successWasteFuncAmount,
+                    error: errorFuncAmount,
+                });
+            }
+
+            function getStopList(id) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/WorkOrder/StopList',
+                    data: { wrkOrdPrdId: id },
+                    success: successStoppedFuncAmount,
+                    error: errorFuncAmount,
+                });
+            }
+
+            
+
+        })
+        $(document).ready(function () {
+            $('#update').on('click', function (event) {
+
+                event.preventDefault();
+
+                swal({
+                    title: 'Dikkat',
+                    text: "Güncellemek İstediğinize Emin misiniz?",
+                    type: 'info',
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger',
+                    cancelButtonText: 'Hayır',
+                    confirmButtonText: 'Evet',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value) {
+                        showloading("İşleminiz Yapılıyor");
+                        $('#frmDailyWorkOrder').submit();
+                    }
+
+                }).catch(swal.noop);
+
+
+
+            });
+
+        })
+
+        function RemoveWaste(id) {
+            $.ajax({
+                type: 'POST',
+                url: '/WorkOrder/RemoveWaste',
+                data: { id: id },
+                success: successWasteFuncAmount,
+                error: errorFuncAmount,
+            });
+        }
+        function RemoveStop(id) {
+            $.ajax({
+                type: 'POST',
+                url: '/WorkOrder/RemoveStop',
+                data: { id: id },
+                success: successStoppedFuncAmount,
+                error: errorFuncAmount,
+            });
+        }
+
+        function successWasteFuncAmount(data) {
+            //ajax ile wrkOrdPrd için girilmiş WasteAmount Listesi çeklilecek. modal içindeki table a basılacak. Bu liste getirme işi aynı zamanda modal açılışlarında da kullanılacak
+            var table = $('#wasteAmountList').DataTable();
+            table.clear().draw();
+            for (var i = 0; i < data.data.length; i++) {
+
+                table.row.add([data.data[i].TypeName, data.data[i].Value,
+                ' <a onClick="RemoveWaste(' + data.data[i].Id + '); return false;" title="Sil"><i class="icon-cross2 text-danger"></i>Sil</a>'
+                ])
+                    .draw()
+                    .node();
+
+            }
+        }
+        function successStoppedFuncAmount(data) {
+            var table = $('#detail').DataTable();
+            table.clear().draw();
+            for (var i = 0; i < data.data.length; i++) {
+
+                table.row.add([data.data[i].TypeName, data.data[i].Value,
+                ' <a onClick="RemoveStop(' + data.data[i].Id + '); return false;" title="Sil"><i class="icon-cross2 text-danger"></i>Sil</a>'
+                ])
+                    .draw()
+                    .node();
+
+            }
+        }
+        function errorFuncAmount() {
+            alert('işlem hatalı');
+        }
+
+    </script>
+}

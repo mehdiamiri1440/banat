@@ -1,0 +1,163 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.WorkOrder.WorkOrderIndexViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h6 class="card-title">İş Emri Listele</h6>
+    </div>
+    <div class="card-body">
+        <div class="form-group row">
+            <div class="col-lg-4">
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Tarih:</label>
+                    <div class="col-md-9">
+                        @Html.TextBoxFor(x => x.WorkitemSelectedDate, new { @placeholder = "Tarih", @class = "form-control", @name = "WorkOrderDate", @id = "WorkOrderDate", @autocomplete = "off" })
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="row">
+                    <label class="col-md-4 col-form-label">Vardiya:</label>
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(x => x.SelectedShiftId, new SelectList(Model.Shifts, "Id", "Name"), "Seçiniz", new { @class = "form-control select-access-value", @id = "SelectedShiftId", @name = "SelectedShiftId" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-primary col-md-12" id="getWorkItem"><i class="icon-search4 font-size-base mr-2"></i> İş Emirlerini Getir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="card" id="workorderlist">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Görevler</strong></h5>
+    </div>
+
+    <div class="card-body">
+
+        <table class="table datatable-basic" id="MixList">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Personel Adı</th>
+                    <th>Personel Soyadı</th>
+                    <th>Makina</th>
+                    <th>Vardiya</th>
+                    <th>Üretilecek Mamul</th>
+                    <th>Üretilecek Miktar</th>
+                    <th>Üretilecek Tarih</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.WorkOrderListDtos)
+                {
+                    <tr>
+                        <td>@item.WorkOrderId</td>
+                        <td>@item.EmployeeName</td>
+                        <td>@item.EmployeeSurName</td>
+                        <td>@item.MachineCode-@item.MachineName</td>
+                        <td>@item.ShiftName</td>
+                        <td></td>
+                        <td></td>
+                        <td>@item.PlannedDate.Value.ToString("dd/MM/yyyy")</td>
+                        <td class="text-center">
+                            <div class="list-icons">
+                                <div class="dropdown">
+                                    <a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">
+                                        <i class="icon-menu9"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(22px, 19px, 0px);">
+                                        <a href="/WorkOrder/WrkOrdDetail?wrkOrdId=@item.WorkOrderId" class="dropdown-item"><i class="icon-pencil"></i>Görüntüle</a>
+                                        <a href="/WorkOrder/WrkOrdResult?wrkOrdId=@item.WorkOrderId" class="dropdown-item"><i class="mi-alarm-on"></i>Üretim Sonucu</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section PageScripts{
+    <script>
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            $.extend($.fn.dataTable.defaults, {
+                columnDefs: [{
+                    orderable: false,
+                    width: 100,
+                    targets: [3]
+                }],
+
+            });
+            $('#MixList').DataTable({
+                "language": {
+                    "url": "/Scripts/dil.json"
+                }
+            });
+
+            $('#WorkOrderDate').daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+
+        })
+
+
+
+
+        function GetWorkOrder() {
+
+            let date = $('#Mixture_Id').val();
+            let shift = $('#Mixture_Id').val();
+
+            $.ajax({
+                type: 'GET',
+                url: '/WorkOrder/GetWorkOrder',
+                data: { date: date, shift: shif },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    var table = $('#MixList').DataTable();
+                    table.clear().draw();
+                    for (var i = 0; i < data.length; i++) {
+
+                        table.row.add([data[i].WorkOrderId, data[i].EmployeeName, data[i].EmployeeSurName, data[i].MachineDisplayName, data[i].ShiftName, data[i].SemiProductName, data[i].PlannedAmount, data[i].PlannedDate,
+                        ' <a onClick="RemoveFormation(' + data[i].Id + '); return false;" title="Çıkar"><i class="icon-cross2 text-danger"></i>Çıkar</a>'
+                        ])
+                            .draw()
+                            .node();
+
+                    }
+
+                },
+                error: function (data) {
+                    swal({
+                        title: 'Hata',
+                        text: 'İşlem Hatalı. Daha Sonra Tekrar Deneyiniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                    });
+                }
+            });
+        }
+    </script>
+}

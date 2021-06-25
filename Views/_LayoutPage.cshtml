@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>E-Fatura Mutabakat</title>
+    <!-- Global stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+    <link href="~/Assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
+    @*<link href="~/Assets/css/icons/fontawesome/styles.min.css" rel="stylesheet" type="text/css">*@
+    <link href="~/Assets/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="~/Assets/css/core.css" rel="stylesheet" type="text/css">
+    <link href="~/Assets/css/components.css" rel="stylesheet" type="text/css">
+    <link href="~/Assets/css/colors.css" rel="stylesheet" type="text/css">
+    <!-- /global stylesheets -->
+    <!-- Core JS files -->
+    <script src="~/Assets/js/plugins/loaders/pace.min.js"></script>
+    <script type="text/javascript" src="~/Assets/js/core/libraries/jquery.min.js"></script>
+    <script type="text/javascript" src="~/Assets/js/core/libraries/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Assets/js/plugins/loaders/blockui.min.js"></script>
+    <!-- /core JS files -->
+    <!-- Theme JS files -->
+    @*<script src="~/Scripts/jquery.dataTables.js"></script>*@
+    <script type="text/javascript" src="~/Assets/js/plugins/tables/datatables/datatables.min.js"></script>
+    <script type="text/javascript" src="~/Assets/js/plugins/forms/selects/select2.min.js"></script>
+    <script type="text/javascript" src="~/Assets/js/core/app.js"></script>
+    <script type="text/javascript" src="~/Assets/js/plugins/ui/prism.min.js"></script>
+    <script type="text/javascript" src="~/Assets/js/plugins/forms/validation/validate.min.js"></script>
+    <script type="text/javascript" src="~/Assets/js/pages/datatables_basic.js"></script>
+    <script type="text/javascript" src="~/Assets/js/pages/components_modals.js"></script>
+    <!-- /theme JS files -->
+    
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+    @RenderSection("Head", false)
+</head>
+<body>
+<body class="sidebar-xs  pace-done">
+<!-- Main navbar -->
+<div class="navbar navbar-inverse">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">@*<img src="~/Assets/images/logo_light.png" alt="">*@</a>
+        <ul class="nav navbar-nav pull-right visible-xs-block">
+            <li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
+            <li><a class="sidebar-mobile-main-toggle"><i class="icon-paragraph-justify3"></i></a></li>
+        </ul>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar-mobile">
+        <ul class="nav navbar-nav">
+            <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+
+               
+            <li class="dropdown dropdown-user">
+                <a class="dropdown-toggle" data-toggle="dropdown">
+                    @*<img src="~/Assets/images/image.png" alt="">*@
+                    <span>@*@userName*@Murat Can PARLAR</span>
+                    @*<i class="caret"></i>*@
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                        
+                    <li><a href="/Account/LogOff"><i class="icon-switch2"></i> Oturum Kapat</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- /main navbar -->
+<!-- Page container -->
+<div class="page-container">
+    <!-- Page content -->
+    <div class="page-content">
+        <!-- Main sidebar -->
+        <div class="sidebar sidebar-main">
+            <div class="sidebar-content">
+                <!-- User menu -->
+                <div class="sidebar-user">
+                    <div class="category-content">
+                        <div class="media">
+                               
+                            <div class="media-body">
+                                <span class="media-heading text-semibold"></span>
+                                <div class="text-size-mini text-muted">
+                                    @*<i class="icon-pin text-size-small"></i> &nbsp;*@Admin
+                                </div>
+                            </div>
+                            <div class="media-right media-middle">
+                                <ul class="icons-list">
+                                    <li>
+                                        @*<a href="#"><i class="icon-cog3"></i></a>*@
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /user menu -->
+                <!-- Main navigation -->
+                <div class="sidebar-category sidebar-category-visible">
+                    <div class="category-content no-padding">
+                        <ul class="navigation navigation-main navigation-accordion">
+                            <!-- Main -->
+                                
+                            <li class="navigation-header"><span>Menü</span> <i class="icon-menu" title="Ana Menü"></i></li>
+                                
+                                
+                           
+                            <li class="@(ViewBag.Current == "OperationManagement" ? "active" : "") ">
+                                <a href="#"><i class="icon-truck"></i> <span>Operasyonel İşlemler</span></a>
+                                <ul>
+                                    <li><a href="/Refund/Index">Depoya İade Talep Girişi</a></li>
+                                </ul>
+                            </li>
+                            
+
+                            
+                            <li class="@(ViewBag.Current == "Store" ? "active" : "") ">
+                                <a href="#"><i class="icon-calculator3"></i> <span>Mağaza İşlemleri</span></a>
+                                <ul>
+                                    <li><a href="/Census/Index">Sayım Planlama İşlemi</a></li>
+                                </ul>
+                            </li>
+                            
+
+                                
+                            <li class="@(ViewBag.Current == "Report" ? "active" : "") ">
+                                <a href="#"><i class="icon-file-stats"></i><span>Raporlar</span></a>
+                                <ul>
+                                    @*@if (UserProperty.IsInRole("SayimRaporlama")) {*@
+                                    <li><a href="/Census/Index">Sayım Raporları</a></li>
+                                    @*}*@
+                                    @*@if (UserProperty.IsInRole("GenelStokRaporu")) {*@
+                                    <li><a href="/Report/GeneralStockReport">Genel Stok Raporu</a></li>
+                                    @*}*@
+                                   
+                                    <li><a href="/Report/ProductAcceptDetailReport">Mal Kabul Detay Listesi</a></li>
+                                    
+                                    <li><a href="/Report/SpMaterialDetails">Malzeme Ekstre Raporu</a></li> 
+                                </ul>
+                            </li>
+                            <li class="@(ViewBag.Current == "Inputs" ? "active" : "") ">
+                                <a href="#"><i class="icon-lifebuoy"></i><span>Tanımlar</span></a>
+                                <ul>
+                                      
+                                    <li><a href="/Employee/add">Yeni Kullanıcı Tanımlama</a></li>
+                                        
+                                    <li><a href="/Employee/Index">Kullanıcılar</a></li>
+                                        
+
+                                        
+                                       
+                                    <li><a href="/Role/add">Yeni Rol Tanımlama</a></li>
+                                        
+                                        
+                                    <li><a href="/Role/Index">Roller</a></li>
+                                        
+                                      
+                                    <li><a href="/RolAuthority/Index">Role Yetki Atama</a></li>
+                                        
+                                    <li><a href="/Template/Index">Sayım Şablonları</a></li>
+                                </ul>
+                            </li>
+                            
+                                    
+
+                            <!-- /main -->
+                        </ul>
+                    </div>
+                </div>
+                <!-- /main navigation -->
+            </div>
+        </div>
+        <!-- /main sidebar -->
+        <!-- Main content -->
+        <div class="content-wrapper">
+            <!-- Page header -->
+            <div class="page-header">
+                <div class="page-header-content">
+                    <div class="page-title">
+                        @if (ViewData["MenuTitle"] == null)
+                        {
+                            ViewData["MenuTitle"] = "BusinessContinuity";
+
+                        }
+                        @if (ViewData["MenuSubTitle"] == null)
+                        {
+                            ViewData["MenuSubTitle"] = "";
+                        }
+                        <h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">@ViewData["MenuTitle"].ToString()</span> - @ViewData["MenuSubTitle"].ToString()</h4>
+                    </div>
+                       
+                </div>
+                <div class="breadcrumb-line">
+                    <ul class="breadcrumb">
+                        <li><a href="#"><i class="icon-home2 position-left"></i> AnaMenü</a></li>
+                        <li><a href="#">@ViewData["MenuTitle"].ToString()</a></li>
+                        <li class="active">@ViewData["MenuSubTitle"].ToString()</li>
+                    </ul>
+                       
+                </div>
+            </div>
+            <!-- /page header -->
+            <!-- Content area -->
+            <div class="content">
+                @*<div id="msj">
+                    <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                </div>*@
+                @{ Html.RenderPartial("_Alerts"); }
+                @RenderBody()
+                <!-- Footer -->
+                <div class="footer text-muted">
+                    &copy; @DateTime.Today.Year <a href="http://www.kurumsoft.com.tr/" target="_blank">KurumSoft</a>
+                </div>
+                <!-- /footer -->
+            </div>
+            <!-- /content area -->
+        </div>
+        <!-- /main content -->
+    </div>
+    <!-- /page content -->
+</div>
+<!-- /page container -->
+
+</body>
+</body>
+</html>

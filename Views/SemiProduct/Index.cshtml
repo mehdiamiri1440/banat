@@ -1,0 +1,73 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.SemiProduct.SemiProductListViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newRoleForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Sisteme Kayıtlı Yarımamuller</strong></h5>
+    </div>
+
+    <div class="card-body">
+        <table class="table datatable-basic" id="semiProductList">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Adı</th>
+                    <th>Kod</th>
+                    <th>Kalıp</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.YariMamulListesi)
+                {
+                <tr>
+                    <td>@item.SemiProduct.Id</td>
+                    <td>@item.SemiProduct.Name</td>
+                    <td>@item.SemiProduct.Code</td>
+                    <td>@item.Mold.Name</td>
+                    <td>
+                        <div class="list-icons">
+                            <div class="dropdown">
+                                <a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="icon-menu9"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(22px, 19px, 0px);">
+                                    <a href="/SemiProduct/Update?SemiProductId=@item.SemiProduct.Id" class="dropdown-item"><i class="icon-pencil"></i>Güncelle</a>
+                                    <a href="/SemiProduct/Delete?SemiProductId=@item.SemiProduct.Id" class="dropdown-item"><i class="icon-cross2"></i>Sil</a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+@section PageScripts{
+    <script>
+
+
+            window.addEventListener('DOMContentLoaded', (event) => {
+                $.extend($.fn.dataTable.defaults, {
+                    columnDefs: [{
+                        orderable: false,
+                        width: 100,
+                        targets: [4]
+                    }],
+
+                });
+                $('#semiProductList').DataTable({
+                    "language": {
+                        "url": "/Scripts/dil.json"
+                    }
+                });
+            })
+    </script>
+}
+

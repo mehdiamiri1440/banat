@@ -1,0 +1,569 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Plan.AcceptMontlyPlanViewModel
+@{
+    ViewBag.Title = "listele";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+@section PageScripts
+{
+    <script src="~/Scripts/jquery.dataTables.js"></script>
+    <script type="text/javascript">
+
+        function RemoveSemiProduct(id) {
+
+            swal({
+                title: 'Dikkat',
+                text: "Yarı Mamülü Listeden Çıkarmak İstediğinize Emin misiniz?.",
+                type: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                cancelButtonText: 'Hayır',
+                confirmButtonText: 'Evet',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Plan/RemoveSemiProduct',
+                        data: { id: id },
+                        success: successFunc,
+                        error: errorFunc
+                    });
+
+                    function successFunc(result, status) {
+                        if (result.IsError == false) {
+
+                            GetSemiProductPlan();
+                        }
+                    }
+                    function errorFunc() {
+                        swal({
+                            title: 'Hata',
+                            text: 'İşlem Hatalı. Daha Sonra Tekrar Deneyiniz!',
+                            type: 'error',
+                            buttonsStyling: false,
+                            confirmButtonClass: 'btn btn-primary',
+                        });
+                    }
+                    
+                }
+                else if (
+                    /* Silmekten Vazgeçti */
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                }
+            });
+
+
+
+        }
+        function GetSemiProductPlan() {
+            showloading("Plan Getiriliyor");
+            var month = $('#SelectedMonthId').val();
+            var year = $('#SelectedYearId').val();
+
+            $.ajax({
+                type: 'GET',
+                url: '/Plan/GetMonthlyPlan',
+                data: { year: year, month: month },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (jsonResponse) {
+                    console.log(jsonResponse);
+                    var table = $('#productBasket').DataTable();
+                    table.clear().draw();
+                    for (var i = 0; i < jsonResponse.ResultValue.length; i++) {
+                        table.row.add([jsonResponse.ResultValue[i].SemiProduct.Code, jsonResponse.ResultValue[i].SemiProduct.Name, jsonResponse.ResultValue[i].SemiProduct.Description, jsonResponse.ResultValue[i].MonthlyGeneralPlan.Amount,
+                            '<div class="list-icons">' +
+                            '<div class="dropdown">' +
+                            '<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                            '<i class="icon-menu9"></i>' +
+                            '</a>' +
+                            '<div class="dropdown-menu dropdown-menu-right" x-placement="top-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(22px, 1px, 0px);">' +
+                            '<a class="dropdown-item" onClick="RemoveSemiProduct(' + jsonResponse.ResultValue[i].MonthlyGeneralPlan.Id + '); return false;" title="Çıkar"><i class="icon-cross2 text-danger"></i>Çıkar</a>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>'])
+                            .draw()
+                            .node();
+                    }
+                    endloading();
+                    if (jsonResponse.ResultValue.length == 0) {
+                        swal({
+                            title: 'Uyarı',
+                            text: 'Seçilen Kriterlere Uygun Kayıt Bulunamadı!',
+                            type: 'warning',
+                            buttonsStyling: false,
+                            confirmButtonClass: 'btn btn-primary',
+                        });
+                    }
+                },
+                error: function (data) {
+                    endloading();
+                    swal({
+                        title: 'Hata',
+                        text: 'İşlem Hatalı. Daha Sonra Tekrar Deneyiniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                    });
+                }
+            });
+        }
+        $(document).ready(function () {
+            $('.select-search').select2({
+            });
+            $('.select-access-multiple-value').select2();
+            var selectedMont = $('#SelectedMonthId option:selected').text();
+            var selectedYear = $('#SelectedYearId option:selected').text();
+            var title = `${selectedYear}-${selectedMont} Ayına Manuel Yarı Mamul Ekle`;
+            $('#manuelAreaTitle').text(title);
+            
+
+            $('#manuelAreaTitle').text(title);
+
+
+            $('#SelectedMonthId').change(function () {
+                var selectedMont = $('#SelectedMonthId option:selected').text();
+                var selectedYear = $('#SelectedYearId option:selected').text();
+                var title = `${selectedYear}-${selectedMont} Ayına Manuel Yarı Mamul Ekle`;
+                $('#manuelAreaTitle').text(title);
+            })
+               
+            
+
+            $('#SelectedYearId').change(function () {
+                var selectedMont = $('#SelectedMonthId option:selected').text();
+                var selectedYear = $('#SelectedYearId option:selected').text();
+                var title = `${selectedYear}-${selectedMont} Ayına Manuel Yarı Mamul Ekle`;
+                $('#manuelAreaTitle').text(title);
+            })
+
+
+            $('#productBasket').DataTable({
+                dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+                "language": {
+                    "url": "/Scripts/dil.json",
+
+                },
+                searching: true,
+                paging: true,
+                "bInfo": false,
+                "bLengthChange": false
+            });
+
+            $.extend($.fn.dataTableExt.oSort, {
+                "turkish-pre": function (a) {
+                    var special_letters = {
+                        "C": "Ca", "c": "ca", "Ç": "Cb", "ç": "cb",
+                        "G": "Ga", "g": "ga", "Ğ": "Gb", "ğ": "gb",
+                        "I": "Ia", "ı": "ia", "İ": "Ib", "i": "ib",
+                        "O": "Oa", "o": "oa", "Ö": "Ob", "ö": "ob",
+                        "S": "Sa", "s": "sa", "Ş": "Sb", "ş": "sb",
+                        "U": "Ua", "u": "ua", "Ü": "Ub", "ü": "ub"
+                    };
+                    for (var val in special_letters)
+                        a = a.split(val).join(special_letters[val]).toLowerCase();
+                    return a;
+                },
+
+                "turkish-asc": function (a, b) {
+                    return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+                },
+
+                "turkish-desc": function (a, b) {
+                    return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+                }
+            });
+
+
+            $('#uploadFile2').click(function () {
+                if ($('#excelFile').val()) {
+                    ShowMessage();
+                }
+                else {
+                    swal({
+                        title: 'Hata',
+                        text: 'Yüklenecek Dosyayı Seçiniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                        confirmButtonText: 'Tamam'
+                    });
+                }
+            });
+            
+            $('#addSemiProduct').click(function () {
+
+                let semiproductId = $('#SemiProducts').val();
+                let amount = $('#SemiProductAmountMontly').val();
+                var month = $('#SelectedMonthId').val();
+                var year = $('#SelectedYearId').val();
+
+
+                if (semiproductId === null || semiproductId == '') {
+                    swal({
+                        title: 'Hata',
+                        text: 'Eklenecek Yarı Mamül Seçilmemiş. Kontrol Ediniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                        confirmButtonText: 'Tamam'
+                    });
+                    return false;
+                }
+                debugger;
+                if (amount === null || amount == '') {
+                    swal({
+                        title: 'Hata',
+                        text: 'Yarı Mamül Miktarı Boş Olamaz. Kontrol Ediniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                        confirmButtonText: 'Tamam'
+                    });
+                    return false;
+                }
+                if (amount == '0') {
+                    swal({
+                        title: 'Hata',
+                        text: 'Yarı Mamül Miktarı Sıfır Olamaz. Kontrol Ediniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                    });
+                    return;
+                }
+
+                if (month === null || month == '' ) {
+                    swal({
+                        title: 'Hata',
+                        text: 'Yarı Mamül Eklenecek Ay Boş Olamaz. Kontrol Ediniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                        confirmButtonText: 'Tamam'
+                    });
+                    return false;
+                }
+                if (year === null || year == '') {
+                    swal({
+                        title: 'Hata',
+                        text: 'Yarı Mamül Eklenecek Yıl Boş Olamaz. Kontrol Ediniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                        confirmButtonText: 'Tamam'
+                    });
+                    return false;
+                }
+
+
+                var model = {
+                    semiproductId: semiproductId,
+                    amount: amount,
+                    year: year,
+                    month: month
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Plan/ManuelSemiProductAdd',
+                    data: model,
+                    success: successFunc,
+                    error: errorFuncCompt
+                });
+
+                function successFunc(result, status) {
+                    if (result.ReturnCode == 0) {
+                        $('#SemiProductAmountMontly').val('');
+                        $("#SemiProducts").val('').trigger('change')
+                        GetSemiProductPlan();
+                        swal({
+                            title: 'Onay!',
+                            text: 'Yarımamul Başarıyla Eklendi.',
+                            type: 'success',
+                            buttonsStyling: false,
+                            confirmButtonClass: 'btn btn-primary',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                    else {
+                        swal({
+                            title: 'Hata',
+                            text: result.ReturnMessage,
+                            type: 'error',
+                            buttonsStyling: false,
+                            confirmButtonClass: 'btn btn-primary',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                }
+
+                function errorFuncCompt(result, status) {
+                    swal({
+                        title: 'Hata',
+                        text: 'Bileşen Ekleme İşlem Hatalı. Daha Sonra Tekrar Deneyiniz!',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                        confirmButtonText: 'Tamam'
+                    });
+                }
+            });
+
+            $('#getDatePlan').click(function () {
+
+                GetSemiProductPlan();
+
+            });
+
+
+            $('.select-access-value').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Select State...'
+            });
+
+
+        })
+
+        function uploadexcl() {
+            //var dark = $('#layoutContent');
+            //$.blockUI({
+            //    message: '<i class="icon-spinner4 spinner" style="font-size:20px"></i><span style="font-size:20px"> Excel Aktarılıyor...</span>',
+            //    overlayCSS: {
+            //        backgroundColor: '#1b2024',
+            //        opacity: 0.8,
+            //        zIndex: 1200,
+            //        cursor: 'wait'
+            //    },
+            //    css: {
+            //        border: 0,
+            //        color: '#fff',
+            //        zIndex: 1201,
+            //        padding: 0,
+            //        backgroundColor: 'transparent'
+            //    }
+            //});
+            showloading('Excel Aktarılıyor...');
+            var formdata = new FormData(); //FormData object
+            var fileInput = document.getElementById('excelFile');
+            //Iterating through each files selected in fileInput
+            for (i = 0; i < fileInput.files.length; i++) {
+                //Appending each file to FormData object
+                formdata.append(fileInput.files[i].name, fileInput.files[i]);
+            }
+            formdata.append("monthId", $('#SelectedMonthId').val());
+            formdata.append("yearId", $('#SelectedYearId').val());
+            //Creating an XMLHttpRequest and sending
+            var xhr = new XMLHttpRequest();
+            var url = '/Plan/UploadExcel';
+            xhr.open('POST', url);
+            xhr.send(formdata);
+            xhr.onreadystatechange = function () {
+
+                
+
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    //window.setTimeout(function () {
+                    //    $(dark).unblock();
+                    //}, 1000);
+                    endloading();
+                    var jsonResponse = JSON.parse(xhr.responseText);
+                    //console.log(xhr);
+                    if (jsonResponse.ReturnCode === 0) {
+                        swal({
+                            title: 'Onay!',
+                            text: jsonResponse.ReturnMessage,
+                            type: 'success',
+                            buttonsStyling: false,
+                            confirmButtonClass: 'btn btn-primary',
+                            confirmButtonText: 'Tamam'
+                        });
+                    } else {
+                        swal({
+                            title: 'Hata!',
+                            text: jsonResponse.ReturnMessage,
+                            type: 'error',
+                            buttonsStyling: false,
+                            confirmButtonClass: 'btn btn-primary',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                    
+
+                    //console.log(jsonResponse);
+                    GetSemiProductPlan();
+                }
+                else {
+                    //window.setTimeout(function () {
+                    //    $(dark).unblock();
+                    //}, 1000);
+                    endloading();
+                    swal({
+                        title: 'Hata!',
+                        text: 'İşlem sırasında hata oluştu. Daha sonra tekrar deneyiniz',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                        confirmButtonText: 'Tamam'
+                    });
+                }
+            }
+            return false;
+        }
+
+        function ShowMessage() {
+            swal({
+                title: 'Dikkat',
+                text: "Plan Oluşturmak İstediğinize Emin misiniz?.",
+                type: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                cancelButtonText: 'Hayır',
+                confirmButtonText: 'Evet',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    //console.log('evet');
+                    
+                    uploadexcl();
+
+                }
+                else if (
+                    /* Silmekten Vazgeçti */
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    console.log('Hayır');
+                }
+            });
+        }
+
+
+    </script>
+}
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h6 class="card-title">Ürün Bilgileri</h6>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("AcceptMonthlyPlan", "Plan", FormMethod.Post, new { @id = "AddCustomerForm", @class = "DataForm", enctype = "multipart/form-data" }))
+        {
+            <div class="form-group row">
+                <div class="col-lg-4">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Aylık Plan Dosyası:</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.excelFile, new { type = "file", @placeholder = "Plan Dosyası", @class = "form-control", @name = "excelFile", @id = "excelFile", @autocomplete = "off" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Ay:</label>
+                        <div class="col-md-9">
+                            @Html.DropDownListFor(x => x.SelectedMonthId, new SelectList(Model.MonthList, "Id", "Name"), "Seçiniz", new { @class = "form-control select-access-value", @id = "SelectedMonthId", @name = "SelectedMonthId" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Yıl:</label>
+                        <div class="col-md-9">
+                            @Html.DropDownListFor(x => x.SelectedYearId, new SelectList(Model.YearList), "Seçiniz", new { @class = "form-control select-access-value", @id = "SelectedYearId", @name = "SelectedYearId" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-primary col-md-12" id="getDatePlan"><i class="icon-database-refresh mr-2"></i> Mevcudu Getir</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @*<button type="submit" class="btn btn-success col-md-12" id="uploadFile"><i class="icon-cart-add2 mr-2"></i> Sisteme Yükle</button>*@
+                            <button type="button" class="btn btn-success col-md-12" id="uploadFile2"><i class="icon-database-insert mr-2"></i> Sisteme Yükle</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+        }
+    </div>
+</div>
+
+
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title text-danger" id="manuelAreaTitle" >Aylık Plana Manuel Yarımamul Ekleme</h5>
+    </div>
+    <div class="card-body">
+
+        <div class="form-group row">
+            <div class="col-lg-4">
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Yarımamul</label>
+                    <div class="col-md-9">
+                        @Html.DropDownListFor(m => m.SelectedSemiProductId, new SelectList(Model.SemiProducts, "Id", "DisplayName"), "Seçiniz",
+                            new { @class = "form-control select-search", @id = "SemiProducts", @name = "SemiProducts" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <div class="row">
+                    <label class="col-md-3 col-form-label">Miktar</label>
+                    <div class="col-md-9">
+                        @Html.TextBoxFor(m => m.SemiProductAmountMontly, new { @class = "form-control nmrc", @placeholder = "Miktar" })
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-2">
+                <div class="row">
+                    <div class="col-md-9">
+                        <button type="button" class="btn btn-success" id="addSemiProduct"><i class="icon-cart-add2 mr-2"></i> Yarımamul Ekle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<div class="card" id="generalMontlyPlanTable">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title">Aylık Genel Plan Oluştur</h5>
+    </div>
+    <div class="card-body">
+
+        <table class="table  datatable-basic" id="productBasket">
+            <thead>
+                <tr>
+                    <th style="width: 10%">Yarı Mamül Kodu</th>
+                    <th style="width: 20%">Yarı Mamül Adı</th>
+                    <th style="width: 50%">Yarı Mamül Tanımı</th>
+                    <th style="width: 10%">Üretilecek Miktar</th>
+                    <th style="width: 10%"></th>
+                </tr>
+            </thead>
+        </table>
+
+
+    </div>
+
+</div>

@@ -1,0 +1,963 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Plan.MontlyPlanViewModel
+@{
+    ViewBag.Title = "MontlyPlan";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+<div class="fixed bg-danger text-center" style="display:none" id="periodInfo">
+    <h1 class="font-weight-semibold" id="prdspn"></h1>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-xl-12" id="divMonth">
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-xl-12">
+                <div class="card">
+                    <div class="card-header header-elements-inline">
+                        <h6 class="card-title">Dönem Bilgileri</h6>
+                    </div>
+                    <div class="card-body">
+                        @using (Ajax.BeginForm("MonthlyPlan", "Plan",
+                          new AjaxOptions
+                          {
+                              HttpMethod = "POST",
+                              OnBegin = "begin",
+                              OnSuccess = "success",
+                              OnComplete = "complete",
+                              OnFailure = "failure"
+
+                          }, new { @class = "DataForm", @id = "Formplan" }))
+                        {
+                            <div class="form-group row">
+                                <div class="col-lg-2">
+                                    <div class="row">
+                                        <label class="col-md-3 col-form-label">Ay:</label>
+                                        <div class="col-md-9">
+                                            @Html.DropDownListFor(x => x.SelectedMonthId, new SelectList(Model.MonthList, "Id", "Name"), "Seçiniz", new { @class = "form-control select-access-value", @id = "SelectedMonthId", @name = "SelectedMonthId" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="row">
+                                        <label class="col-md-3 col-form-label">Yıl:</label>
+                                        <div class="col-md-9">
+                                            @Html.DropDownListFor(x => x.SelectedYearId, new SelectList(Model.YearList), "Seçiniz", new { @class = "form-control select-access-value", @id = "SelectedYearId", @name = "SelectedYearId" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="row">
+                                        <label class="col-md-4 col-form-label">Makina:</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(m => m.SelectedMachineId, new SelectList(Model.MachineList2, "Id", "Name"), "Seçiniz",
+    new { @class = "form-control select-search", @id = "SelectedMachineId", @name = "SelectedMachineId", })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button" class="btn btn-primary col-md-12" id="refreshTable">Yenile</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="button" class="btn btn-success col-md-12" id="saveDetailPlan" data-nmbofday="@Model.montlyTables.Count">Planı Kaydet</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row">
+
+            <div class="col-lg-12 col-md-12 col-xl-12">
+                <div class="card">
+                    <div class="card-header bg-white header-elements-inline">
+                        <h5 class="card-title"><strong>Aylık Genel Plan</strong></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="card">
+                            <div class="card-header header-elements-inline">
+                                <h5 class="card-title" id="planCard" data-mchnId="@Model.MachineList[0].MachineInfo.Id">@Model.MachineList[0].MachineInfo.Name</h5>
+                            </div>
+                            <div class="card-body">
+                                Açıklama
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered" id="planTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Gün</th>
+                                            <th>Vadiye</th>
+                                            <th>Ürün Kodu</th>
+                                            <th>Miktar</th>
+                                            <th>Diğer Makinelerde Planlanan Miktar</th>
+                                            <th>Gerçekleşen Üretim</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{int perferenceNo = 0;
+                                            int counter = 0;}
+                                        @foreach (var item in Model.montlyTables)
+                                        {
+
+                                            <tr>
+                                                @if (item.NumberOfDay != perferenceNo)
+                                                {
+                                                    perferenceNo = item.NumberOfDay;
+                                                    <td rowspan="3" width="4%">@item.NumberOfDay</td>
+                                                }
+                                                <td width="6%">@item.ShiftName</td>
+                                                <td id="@string.Format("{0}_1",counter)" data-colprd="@string.Format("{0}_{1}",@item.NumberOfDay,@item.ShiftNo)" width="60%">
+
+
+                                                    <div class="input-group">
+                                                        <input class="autoc ui-autocomplete-input form-control" type="text" data-smCode="@counter" data-day="@item.NumberOfDay" name="MontlyPlanBulkAddList[@counter].SmCode" data-shiftId="@item.ShiftNo">
+                                                        <span class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <a href="javascript:void(0)" class="badge badge-icon" onclick="abc(@counter,@item.ShiftNo,@item.NumberOfDay)" title="Aynı Anda Birden Fazla Üretilecek Ürün Ekle">
+                                                                    <i class="icon-add"></i>
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="badge badge-icon" onclick="xyz2(@counter,this)" title="Temizle">
+                                                                    <i class="icon-bin top-0 text-danger"></i>
+                                                                </a>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td id="@string.Format("{0}_2",counter)" data-colamnt="@string.Format("{0}_{1}",@item.NumberOfDay,@item.ShiftNo)" width="10%">
+                                                    <input class="form-control" style="width:100px" type="text" name="MontlyPlanBulkAddList[@counter].Amount" data-smAmount="@counter" autocomplete="off">
+                                                    <div class="text-muted font-size-sm"></div>
+                                                </td>
+                                                <td data-colplnedamnt="@string.Format("{0}_{1}",@item.NumberOfDay,@item.ShiftNo)" width="10%"></td>
+                                                <td data-colactamnt="@string.Format("{0}_{1}",@item.NumberOfDay,@item.ShiftNo)" class="10%"></td>
+                                            </tr>
+                                            counter++;
+
+                                        }
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                        <input class="selectList  form-control" type="hidden" name="MontlyPlanBulkAddList[@counter].Amount" data-smAmount="@counter">
+                        <input type="hidden" id="counterNum" name="counterNum" value="@counter" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="planDetailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="prdNameModalLabel">Planlandığı Makinalar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-xs" id="detail">
+                    <thead>
+                        <tr>
+                            <th>Makina Adı</th>
+                            <th>Tarih</th>
+                            <th>Miktar</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="productionResultModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-full" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="prductionName">Yarı Mamül Adı</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-xs" id="productionDetail">
+                    <thead>
+                        <tr>
+                            <th>Üretim Tarihi</th>
+                            <th>Makina Adı</th>
+                            <th>Vardiya</th>
+                            <th>Planlanan Miktar</th>
+                            <th>Gerçekleşen Miktar</th>
+                            <th>Fire Miktarı</th>
+                            <th>Duruş Zamanı</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section PageStyle{
+    <style>
+
+        .fixed {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            padding: 10px 10px 0;
+            height: 50px;
+            z-index: 1500;
+        }
+    </style>
+}
+
+@section PageScripts{
+  
+    <script>
+
+        function setMachineInfo(obj) {
+
+
+            debugger;
+            $('.addinput').remove();//vardiyaya eklenen extra inputları temizleyelim.
+            $('.extraInput').remove();  
+
+            //inputların id doğru gitmesi için default hale getirelim.
+            var cntnbr = $('#saveDetailPlan').data("nmbofday")
+            $('#counterNum').val(cntnbr);
+
+            $("#planTable  > tbody > tr").each(function () {
+                $(this).find("input:text,textarea").each(function () {
+                    $(this).val('');
+                });
+                $(this).find("span").each(function () {
+
+                    //if ($(this).hasClass('aaa'));
+                    //$(this).text('');
+                });
+            });
+
+
+
+            $("[data-colamnt]>div>span").each(function () {
+                $(this).remove();
+            });
+
+            $("[data-colamnt]").each(function () {
+                $(this).find("span").each(function () {
+                   // $(this).text('');
+                    $(this).remove();
+                });
+            });
+
+            $("[data-colplnedamnt] > a[href]").each(function () {
+                $(this).remove();
+            });
+
+            $("[data-colactamnt] > p").each(function () {
+                $(this).remove();
+            });
+
+
+
+
+            $('#planTable  td[data-colplnedamnt]').empty();
+
+            var dark = $('#layoutContent');
+            $.blockUI({
+                message: '<i class="icon-spinner4 spinner" style="font-size:20px"></i><span style="font-size:20px"> Sayfa Hazırlanıyor...</span>',
+                fadeIn: 400,
+                timeout: 1600, //unblock after 2 seconds
+                overlayCSS: {
+                    backgroundColor: '#1b2024',
+                    opacity: 0.8,
+                    zIndex: 1200,
+                    cursor: 'wait'
+                },
+                css: {
+                    border: 0,
+                    color: '#fff',
+                    zIndex: 1201,
+                    padding: 0,
+                    backgroundColor: 'transparent'
+                }
+            });
+
+
+            $.ajax({
+                type: "GET",
+                url: "/Plan/GetMonthlyPlanDetail",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                data: {
+                    machineId: $('#SelectedMachineId').val(),
+                    month: $('#SelectedMonthId').val(),
+                    year: $('#SelectedYearId').val()
+                },
+                success: function (data, status) {
+                    console.log(data);
+                    var lastid = 0;
+                    for (var i = 0; i < data.data.length; i++) {
+                        //console.log(data.data[i].WorkOrder.Date);
+                        debugger;
+                        var woUtcDate = moment(data.data[i].WorkOrder.Date);
+                        var woDate = (moment.utc(woUtcDate).local().format('YYYY-MM-DD'));
+
+                        const date = moment(woDate);
+
+                        const dow = date.format('D');
+                        //console.log(dow + "_" + data.data[i].WorkOrder.ShiftId);
+                        var id = dow + "_" + data.data[i].WorkOrder.ShiftId;
+                        
+                        if (lastid == id) {
+                            debugger;
+                            var cntr = dow * 3//data.data[i].WorkOrder.ShiftId;
+
+                            if (data.data[i].WorkOrder.ShiftId == 1) {
+                                cntr = cntr - 3;
+                            }
+                            if (data.data[i].WorkOrder.ShiftId == 2) {
+                                cntr = cntr - 2;
+                            }
+                            if (data.data[i].WorkOrder.ShiftId == 3) {
+                                cntr = cntr - 1;
+                            }
+                            //cntr = cntr - 1;
+                            var inptId = $('#counterNum').val();
+                            abc(cntr, data.data[i].WorkOrder.ShiftId, dow);
+                            console.log(data.data[i]);
+                            $('*[data-smcode="' + inptId + '"]').val(data.data[i].SemiProduct.DisplayName);
+                            $('*[data-smcode="' + inptId + '"]').attr('data-planid', data.data[i].MonthlyGeneralPlan.Id);//plan id
+                            var obj = `#amount_${inptId}`;
+                            $(obj).val(data.data[i].WorkOrderProduct.PlannedAmount);//O ay için toplam planlanan
+                            $('*[data-smcode="' + inptId + '"]').attr('data-id', data.data[i].SemiProduct.Id);
+                            //$('*[data-colamnt="' + id + '"] span').text(`Aylık Top. Plan.:${data.data[i].MonthlyGeneralPlan.Amount}`);
+                        }
+                        else {
+                            debugger;
+                            $('*[data-colprd="' + id + '"] input').val(data.data[i].SemiProduct.DisplayName);
+                            $('*[data-colprd="' + id + '"] input').attr('data-id', data.data[i].SemiProduct.Id);
+                            $('*[data-colprd="' + id + '"] input').attr('data-planid', data.data[i].MonthlyGeneralPlan.Id);//plan id
+                            $('*[data-colamnt="' + id + '"] input').val(data.data[i].WorkOrderProduct.PlannedAmount);//O ay için toplam planlanan
+                            $('*[data-colamnt="' + id + '"] span').text(`ATP.:${data.data[i].MonthlyGeneralPlan.Amount}`);
+                            var cntr = dow * 3//data.data[i].WorkOrder.ShiftId;
+
+                            if (data.data[i].WorkOrder.ShiftId == 1) {
+                                cntr = cntr - 3;
+                            }
+                            if (data.data[i].WorkOrder.ShiftId == 2) {
+                                cntr = cntr - 2;
+                            }
+                            if (data.data[i].WorkOrder.ShiftId == 3) {
+                                cntr = cntr - 1;
+                            }
+                            var inptId = cntr ;
+                        }
+
+
+
+                        //********aynı dönem için daha önce aynı ürün için planlama yapılmışsa toplamını getireceğiz***********
+                        for (var j = 0; j < data.totalyList.length; j++) {
+                            if (data.data[i].SemiProduct.Id == data.totalyList[j].SmPrdId) {
+                                var ahref = `<p><a href="#planDetailModal"  data-toggle="modal" name="spn${inptId}bdg" id="spn${inptId}bdg" data-spid=${data.totalyList[j].SmPrdId} data-planid=${data.totalyList[j].PlanId}  class="badge bg-primary badge-pill">${data.totalyList[j].TotalPlannedProductAmount}</a></p>`
+                                var ahrefActualAmount = `<p id="rmnd${inptId}p"><a href="#productionResultModal"  data-toggle="modal" data-spid=${data.totalyList[j].SmPrdId} data-planid=${data.totalyList[j].PlanId}  class="badge bg-success badge-pill">${data.totalyList[j].ActualyAmount}</a>  Kalan:${data.totalyList[j].Remainder}</p>`
+
+                                $('*[data-colplnedamnt="' + id + '"]').append(ahref);
+                                $('*[data-colactamnt="' + id + '"]').append(ahrefActualAmount);
+                            }
+                        }
+                        //********aynı dönem için daha önce aynı ürün için planlama yapılmışsa toplamını getireceğiz***********
+
+
+                        lastid = id;
+                    }
+                    window.setTimeout(function () {
+                        $(dark).unblock();
+                    }, 1000);
+                },
+                error: function (xhr, status, err) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(err);
+                    window.setTimeout(function () {
+                        $(dark).unblock();
+                    }, 1000);
+                    alert('Error');
+                }
+            });
+
+        }
+
+        function begin() {
+            $('#userMsj').empty();
+            var dark = $(".DataForm");
+            $(dark).block({
+                message: '<i class="icon-spinner spinner"></i> İşleminiz Yapılıyor...',
+                overlayCSS: {
+                    backgroundColor: '#1b2024',
+                    opacity: 0.8,
+                    zIndex: 1200,
+                    cursor: 'wait'
+                },
+                css: {
+                    border: 0,
+                    color: '#fff',
+                    padding: 0,
+                    zIndex: 1201,
+                    backgroundColor: 'transparent'
+                }
+            });
+        }
+        function success(result) {
+            console.log(result);
+            var light = $(".DataForm");
+            $(light).unblock();
+        }
+        function complete(result) {
+            var light = $(".DataForm");
+            $(light).unblock();
+        }
+        function failure(result) {
+            var light = $(".DataForm");
+            $(light).unblock();
+        }
+
+        function abc(id, shftNo, day) {
+            debugger;
+            var a = $(this).closest('td');
+            var counterstop = $('#counterNum').val();
+            counterstop = Number(counterstop);
+            var nameofCodeInpt = `MontlyPlanBulkAddList[${counterstop}].SmCode`;
+            var nameofAmountInpt = `MontlyPlanBulkAddList[${counterstop}].Amount`;
+            var spn = `<span class="input-group-append"><span class="input-group-text"><a href="javascript:void(0)" class="badge badge-icon" onclick="xyz(${counterstop},this)" title="Aynı Anda Birden Fazla Üretilecek Ürün Ekle"><i class="icon-bin top-0 text-danger"></i></a></span></span>`;
+
+
+                                      
+                           
+               
+
+            $('#' + id + "_1").append(`<div class="input-group extraInput"><input class="autoc ui-autocomplete-input form-control addinput" type="text" data-smCode="${counterstop}" data-day="${day}" name="' + nameofCodeInpt + '" data-shiftId="${shftNo}" />${spn}</div>`);
+            $('#' + id + "_2").append(`<input class="form-control addinput extraInput" type="text" data-smAmount="${counterstop}"  name="${nameofAmountInpt}" id=amount_${counterstop} autocomplete="off">`);
+            $('#counterNum').val(counterstop + 1);
+            //$('#saveDetailPlan').attr("data-nmbofday", $('#counterNum').val())
+            //window.document.dispatchEvent(new Event("DOMContentLoaded", {
+            //    bubbles: true,
+            //    cancelable: true
+            //}));
+            autocomplete();
+
+        }
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+
+            $('#SelectedMachineId').val(1);
+
+            $(".DataForm").submit(function (E) {
+
+                $.blockUI({
+                    message: '<i class="icon-spinner4 spinner" style="font-size:20px"></i><span style="font-size:20px">  İşlem Yapılıyor...</span>',
+                    overlayCSS: {
+                        backgroundColor: '#1b2024',
+                        opacity: 0.8,
+                        zIndex: 1200,
+                        cursor: 'wait'
+                    },
+                    css: {
+                        border: 0,
+                        color: '#fff',
+                        padding: 0,
+                        zIndex: 1201,
+                        backgroundColor: 'transparent'
+                    },
+                });
+
+            });
+
+            $('#refreshTable').click(function () {
+                var obj = $(this);
+
+                if ($('#SelectedMonthId').val() == '') {
+                    swal({
+                        title: 'Hata',
+                        text: 'Lütfen Ay seçiniz',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                    });
+                    return;
+                }
+                if ($('#SelectedYearId').val() == '') {
+                    swal({
+                        title: 'Hata',
+                        text: 'Lütfen Yıl seçiniz',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                    });
+                    return;
+                }
+                if ($('#SelectedMachineId').val() == '') {
+                    swal({
+                        title: 'Hata',
+                        text: 'Lütfen Makine seçiniz',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                    });
+                    return;
+                }
+
+                setMachineInfo(obj);
+            })
+
+            $(".ui-autocomplete-input").change(function () {
+                //console.log($(this).val());
+                //var a = $(this).val();
+                //if (a === '') {
+                //    console.log(1313131);
+                //}
+                //var nameTxt = ($(this).data("smcode"));
+                //var sid1 = `#spn${nameTxt}amnt`;
+                //var sid2 = `#spn${nameTxt}pln`;
+                //var sid3 = `#spn${nameTxt}bdg`;
+                //$(sid1).remove();
+                //$(sid2).remove();
+                //$(sid3).remove();
+            });
+
+            autocomplete();
+
+
+            $('#saveDetailPlan').click(function () {
+
+                swal({
+                    title: 'Dikkat',
+                    text: "Plan Oluşturmak İstediğinize Emin misiniz?.",
+                    type: 'warning',
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger',
+                    cancelButtonText: 'Hayır',
+                    confirmButtonText: 'Evet',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value) {
+                        ShowLoading();
+                        calculateAndSave();
+
+                    }
+                    else if (
+                        /* Silmekten Vazgeçti */
+                        result.dismiss === swal.DismissReason.cancel
+                    ) {
+                        console.log('Hayır');
+
+                    }
+                });
+
+            });
+
+
+
+            function calculateAndSave() {
+                var rowCount = $('#counterNum').val();//$('#saveDetailPlan').data("nmbofday")
+                MontlyPlanBulkAdd = [];
+                var monthId;
+                var yearId;
+                var day;
+                var machineId = $('#SelectedMachineId').val();//$('#planCard').attr("data-mchnId");
+                for (var i = 0; i < rowCount; i++) {
+                    item = {}
+                    item["SmCode"] = $('*[data-smCode=' + i + ']').val();
+                    item["Amount"] = $('*[data-smAmount=' + i + ']').val();
+                    item["Id"] = $('*[data-smCode=' + i + ']').attr("data-id")
+                    monthId = $('#SelectedMonthId').val();
+                    yearId = $('#SelectedYearId').val();
+                    day = $('*[data-smCode=' + i + ']').attr("data-day");
+                    item["Date"] = `${yearId}-${monthId}-${day}`;
+                    item["ShiftId"] = $('*[data-smCode=' + i + ']').attr("data-shiftId");
+                    debugger;
+                    item["SemiProductId"] = $('*[data-smCode=' + i + ']').attr("data-id");
+                    item["MachineId"] = machineId;
+                    item["ProductionPlanId"] = $('*[data-smCode=' + i + ']').attr("data-planid");
+                    MontlyPlanBulkAdd.push(item);
+                }
+                var MontlyPlanViewModel = {
+                    MontlyPlanBulkAddList: JSON.stringify(MontlyPlanBulkAdd)
+                }
+                //console.log(MontlyPlanViewModel);
+                $.ajax({
+                    type: 'POST',
+                    url: '/Plan/MonthlyPlanCreate',
+                    data: { model: MontlyPlanBulkAdd, machineId: machineId, year: $('#SelectedYearId').val(), month: $('#SelectedMonthId').val() },
+                    success: successFuncCstmrAdd,
+                    error: errorFuncCstmrAdd,
+                    complete: function () {
+                        $.unblockUI();
+                    }
+                });
+            }
+
+
+
+
+
+
+            $('.select-access-value').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Select State...'
+            });
+
+            $('#planDetailModal').on('show.bs.modal', function (e) {
+                var smId = $(e.relatedTarget).data('spid');
+                var plId = $(e.relatedTarget).data('planid');
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Plan/GetMonthlyPlanDetailList',
+                    data: { smPrdId: smId, plnId: plId },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data, status) {
+                        $('#detail tbody').empty();
+                        console.log(data);
+                        for (var i = 0; i < data.data.length; i++) {
+                            //console.log(data.data[i]);
+                            var woUtcDate = moment(data.data[i].WoDate);
+                            var woDate = (moment.utc(woUtcDate).local().format('DD-MM-YYYY'));
+                            $('#detail > tbody').append(`<tr><td>${data.data[i].MachineName}</td><td>${woDate}</td><td>${data.data[i].PlannedAmount}</td></tr>`);
+                            $('#prdNameModalLabel').text(data.semiProductName);
+                        }
+                    },
+                    error: errorFuncCstmrAdd
+                });
+            });
+
+            $('#productionResultModal').on('show.bs.modal', function (e) {
+                var smId = $(e.relatedTarget).data('spid');
+                var monthId = $('#SelectedMonthId').val();
+                var yearId = $('#SelectedYearId').val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/WorkOrder/GetProductionStatus',
+                    data: { year: yearId, month: monthId, smpId: smId },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data, status) {
+                        $('#productionDetail tbody').empty();
+                        console.log(data.data);
+                        for (var i = 0; i < data.data.length; i++) {
+
+                            var woUtcDate = moment(data.data[i].WoDate);
+                            var woDate = (moment.utc(woUtcDate).local().format('DD-MM-YYYY'));
+                            var stpTime = data.data[i].StopTime;
+                            if (stpTime == null) {
+                                stpTime = "-";
+                            }
+                            var acAmntstyle = "text-primary";
+                            if (data.data[i].ActualAmount > 0) {
+                                acAmntstyle = "text-success font-weight-bold";
+                            }
+                            var wstAmntStyle = "text-primary";
+                            if (data.data[i].WasteAmount > 0) {
+                                wstAmntStyle = "text-danger font-weight-bold";
+                            }
+
+                            $('#productionDetail > tbody').append(`<tr>
+                                                                                            <td>${woDate}</td>
+                                                                                            <td>${data.data[i].MachineName}</td>
+                                                                                            <td>${data.data[i].ShiftName}</td>
+                                                                                            <td>${data.data[i].PlannedAmount}</td>
+                                                                                            <td class="${acAmntstyle}">${data.data[i].ActualAmount}</td>
+                                                                                            <td class="${wstAmntStyle}">${data.data[i].WasteAmount}</td>
+                                                                                            <td>${stpTime}</td>
+                                                                                        </tr>`);
+                            $('#prductionName').text(data.data[i].SemiProductName);
+                        }
+                    },
+                    error: errorFuncCstmrAdd
+                });
+            });
+
+
+            $("#SelectedMachineId").change(function () {
+                var mName = $("#SelectedMachineId option:selected").text();
+                $('#planCard').html(mName);
+                var obj = $(this);
+                setMachineInfo(obj);
+
+
+            });
+
+        });
+
+        function ShowMessage() {
+            swal({
+                title: 'Dikkat',
+                text: "Plan Oluşturmak İstediğinize Emin misiniz?.",
+                type: 'warning',
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                cancelButtonText: 'Hayır',
+                confirmButtonText: 'Evet',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    //console.log('evet');
+                }
+                else if (
+                    /* Silmekten Vazgeçti */
+                    result.dismiss === swal.DismissReason.cancel
+                ) {
+                    console.log('Hayır');
+
+                }
+            });
+        }
+
+
+
+        function ShowLoading() {
+            $.blockUI({
+                message: '<i class="icon-spinner4 spinner" style="font-size:20px"></i><span style="font-size:20px">  İşlem Yapılıyor...</span>',
+                overlayCSS: {
+                    backgroundColor: '#1b2024',
+                    opacity: 0.8,
+                    zIndex: 1200,
+                    cursor: 'wait'
+                },
+                css: {
+                    border: 0,
+                    color: '#fff',
+                    padding: 0,
+                    zIndex: 1201,
+                    backgroundColor: 'transparent'
+                },
+            });
+        }
+
+        function autocomplete() {
+            $('.autoc').on("focus", function () {
+                var nameTxt = ($(this).data("smcode"));
+                var objName = $(this).attr('name');
+                var res = objName.split(".");
+                $(this).autocomplete({
+                    minLength: 0,
+                    source: function (request, response) {
+                        $.ajax({
+                            type: "GET",
+                            url: "/SemiProduct/SemiProductListAutoComplate",
+                            contentType: "application/json; charset=utf-8",
+                            ddataType: "json",
+                            data: {
+                                text: $('*[data-smcode=' + nameTxt + ']').val(),
+                                month: $('#SelectedMonthId').val(),
+                                year: $('#SelectedYearId').val()
+                            },
+                            success: function (data, status) {
+                                response(data);
+
+                            },
+                            error: function (xhr, status, err) {
+                                alert('error')
+
+                            }
+                        });
+                    },
+                    select: function (event, ui) {
+                        var sid1 = `#spn${nameTxt}amnt`;
+                        var sid2 = `#spn${nameTxt}pln`;
+                        var sid3 = `#spn${nameTxt}bdg`;
+                        var sid4 = `#spn${nameTxt}icn1`;
+                        // var sid5 = `#spn${nameTxt}icn2`;
+                        var p = `#rmnd${nameTxt}p`;//p kalan
+
+
+                        var a = ($(this).data("day"));
+                        var b = ($(this).data("shiftid"));
+                        var tdId = `${a}_${b}`;
+
+                        $(sid1).remove();
+                        $(sid2).remove();
+                        $(sid3).remove();
+                        $(sid4).remove();
+                        $(p).remove();
+                        $('*[data-smcode=' + nameTxt + ']').val(ui.item.SemiProduct.DisplayName);
+                        $('*[data-smcode=' + nameTxt + ']').attr('data-id', ui.item.SemiProduct.Id);
+                        $('*[data-smcode=' + nameTxt + ']').attr('data-planid', ui.item.MonthlyGeneralPlan.Id);
+                        var monthlyplanModel = {
+                            SelectedMachineId: $('#planCard').attr("data-mchnId"),
+                            SelectedMonth: $('#SelectedMonthId').val(),
+                            SelectedYear: $('#SelectedYearId').val(),
+                            SemiPrdId: ui.item.SemiProduct.Id
+                        };
+
+                        $('*[data-colamnt="' + tdId + '"]').append(`<span class="badge badge-mark border-blue mr-1" name="spn${nameTxt}icn1" id="spn${nameTxt}icn1"></span><span name="spn${nameTxt}pln" id="spn${nameTxt}pln">ATP.:${ui.item.MonthlyGeneralPlan.Amount}</span>`);
+                        $.ajax({
+                            type: 'GET',
+                            data: monthlyplanModel,
+                            url: '/Plan/GetMonthlyPlanByPrd',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (data, status) {
+                                console.log(data);
+                                var totally = data.data;
+                                var spId = data.spId;
+                                var planId = data.planId;
+                                href = "#prdDetailModal"
+                                var ahref = `<p><a href="#planDetailModal"  name="spn${nameTxt}bdg" id="spn${nameTxt}bdg"  data-toggle="modal" data-spid=${spId} data-planid=${planId}  class="badge bg-primary badge-pill">${totally}</a></p>`
+                                $('*[data-colplnedamnt="' + tdId + '"]').append(ahref);
+                                //$('*[data-colamnt="' + tdId + '"] > div').append(` <span class="badge badge-mark border-green mr-1" name="spn${nameTxt}icn2" id="spn${nameTxt}icn2"></span><span name="spn${nameTxt}amnt" id="spn${nameTxt}amnt"> Tek Seferde Maks Ürtm.:${data.fulldata.SemiProductDetail.ShiftMaxPiece}</span>`);
+                                $('*[data-smamount=' + nameTxt + ']').val(data.fulldata.SemiProductDetail.ShiftMaxPiece);
+                                var ahrefActualAmount = `<p  id="rmnd${nameTxt}p"><a href="#productionResultModal"  data-toggle="modal" data-spid=${data.spId} data-planid=${data.planId}  class="badge bg-success badge-pill">${data.actlyAmount}</a>  Kalan:${data.Remainder}</p>`
+                                $('*[data-colactamnt="' + tdId + '"]').append(ahrefActualAmount);
+
+                            },
+                            error: errorFuncCstmrAdd
+                        });
+
+
+
+                        return false;
+                    },
+                    //},
+                    change: function (event, ui) {
+                        if ($(this).val() === "") {
+                            var sid1 = `#spn${nameTxt}amnt`;
+                            var sid2 = `#spn${nameTxt}pln`;
+                            var sid3 = `#spn${nameTxt}bdg`;
+                            var sid4 = `#spn${nameTxt}icn1`;
+                            var p = `#rmnd${nameTxt}p`;//p kalan
+                            //  var sid5 = `#spn${nameTxt}icn2`;
+                            $(sid1).remove();
+                            $(sid2).remove();
+                            $(sid3).remove();
+                            $(sid4).remove();
+                            $('*[data-smamount=' + nameTxt + ']').val('');
+                            $(p).remove();
+                            //$('*[data-smamount=' + nameTxt + ']>span').remove();
+                            //  $(sid5).remove();
+                        }
+
+
+                    }
+                })
+                    .autocomplete('instance')._renderItem = function (ul, item) {
+                        return $('<li>').append(`<span class="font-weight-semibold pb-0">${item.SemiProduct.Code} </span><div class="text-muted font-size-sm pt-0">${item.SemiProduct.Name} - AylıkPlan:${item.MonthlyGeneralPlan.Amount}</div>`).appendTo(ul);
+                    };
+
+
+
+            });
+        }
+        function errorFuncCstmrAdd(result, status) {
+            $.unblockUI();
+            alert('error');
+        }
+
+        function successFuncCstmrAdd(result, status) {
+            $.unblockUI();
+            swal({
+                title: 'Onay!',
+                text: 'İşlem Başarıyla Tamamlandı',
+                type: 'success',
+                buttonsStyling: false,
+                confirmButtonClass: 'btn btn-primary',
+                confirmButtonText: 'Tamam'
+            });
+
+        }
+
+
+        $(window).scroll(function () {
+            var $height = $(window).scrollTop();
+            if ($height > 275) {
+                $('#periodInfo').css("display", "block");
+                var year = $('#SelectedYearId option:selected').text();
+                var month = $('#SelectedMonthId option:selected').text();
+                var mchnId = $('#SelectedMachineId option:selected').text();
+                var lnk = '<a href="#" onClick="svFrm();">Kaydetmek için Tıklayınız</a>';
+                $('#prdspn').html(`${year}-${month} dönemi ${mchnId} makinası için plan yapmaktasınız. ${lnk}`);
+            } else {
+                $('#periodInfo').css("display", "none");
+            }
+        });
+
+        function svFrm() {
+            $('#saveDetailPlan').click()();
+        }
+        function xyz(id, obj) {
+            console.log(obj)
+            //$('input').filter('[data-smcode="'+id+'"]').remove();
+            //$(obj).css('display', 'none');
+            var j = $(obj).parents('.input-group-append');
+            console.log(j);
+            j.css('display', 'none');
+            $('input').filter('[data-smcode="' + id + '"]').css('display', 'none');
+            $('input').filter('[data-smamount="' + id + '"]').css('display', 'none');
+            var sid2 = `#spn${id}pln`;
+            var sicn = `#spn${id}icn1`;  
+            var sdbg = `#spn${id}bdg`;//spn84bdg
+            var p = `#rmnd${id}p`;//p kalan
+            
+            $(sid2).remove();
+            $(sicn).remove();
+            $(sdbg).remove();
+            $(p).remove();
+        }
+        function xyz2(id, obj) {
+            //var j = $(obj).parents('.input-group-append');
+            //console.log(j);
+            //j.css('display', 'none');
+            $('input').filter('[data-smcode="' + id + '"]').val('');
+            $('input').filter('[data-smamount="' + id + '"]').val('');
+            var sid2 = `#spn${id}pln`;
+            var sicn = `#spn${id}icn1`;
+            var sdbg = `#spn${id}bdg`;//spn84bdg
+            var p = `#rmnd${id}p`;//p kalan
+
+            $(sid2).remove();
+            $(sicn).remove();
+            $(sdbg).remove();
+            $(p).remove();
+        }
+    </script>
+
+
+
+
+
+}

@@ -1,0 +1,115 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Customer.CustomerAddViewModel
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+@section PageScripts
+{
+    <script src="~/Scripts/jquery.validate.min.js"></script>  
+     <script>
+        $(document).ready(function () {
+            $(".DataForm").submit(function (E) {
+                var formm = $(this);
+                if (formm.valid()) {
+                    $.blockUI({
+                        message: '<i class="icon-spinner4 spinner" style="font-size:20px"></i><span style="font-size:20px">  İşlem Yapılıyor...</span>',
+                        overlayCSS: {
+                            backgroundColor: '#1b2024',
+                            opacity: 0.8,
+                            zIndex: 1200,
+                            cursor: 'wait'
+                        },
+                        css: {
+                            border: 0,
+                            color: '#fff',
+                            padding: 0,
+                            zIndex: 1201,
+                            backgroundColor: 'transparent'
+                        },
+                    });
+                }
+            });
+
+            $("#Cities").change(function () {
+               
+                var cId = $('#Cities').val();
+                $('#Districts').empty();
+                $.ajax({
+                    type: 'GET',
+                    url: '/City/DistrictList',
+                    data: { cityId: cId },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: successFunc,
+                    error: errorFunc
+                });
+
+                function successFunc(result, status) {
+                    var jsonData = JSON.parse(result.ResultValue);
+                    $('#Districts').append('<option>Seçiniz</option>');
+                    for (var i = 0; i < jsonData.length; i++) {
+                        var users = jsonData[i];
+                        console.log(users.DistrictName);
+                        $('#Districts').append(new Option(users.DistrictName, users.Id));
+                        $("#Districts").prop("disabled", false);
+                    }
+                   
+                }
+
+                function errorFunc() {
+                    alert('error');
+                }
+            });
+        });
+    </script>
+}
+<div class="card">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Yeni Müşteri Tanımlama</strong></h5>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("Add","Customer",FormMethod.Post, new {@id="AddCustomerForm",@class= "DataForm" }))
+        {
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label">Firma Tanımı:</label>
+                <div class="col-lg-9">
+                    @Html.TextBoxFor(x => x.CustomerName, new { @placeholder = "Kullanıcı Adı", @class = "form-control",@name= "CustomerName", @id= "CustomerName" })
+                    @Html.ValidationMessageFor(model => model.CustomerName, "", new { @class = "text-danger" })
+                   
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label">Adress:</label>
+                <div class="col-lg-9">
+                    @Html.TextBoxFor(x => x.CustomerAddress, new { @placeholder = "Address", @class = "form-control",@name= "CustomerAddress", @id= "CustomerAddress" })
+                    @Html.ValidationMessageFor(model => model.CustomerAddress, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label">İl:</label>
+                <div class="col-lg-9">
+                    @Html.DropDownListFor(m => m.CityId, new SelectList(Model.Cities, "Id", "CityName"),"Seçiniz",
+                        new {  @class = "form-control" ,@id="Cities" ,@name= "Cities" })
+                    @Html.ValidationMessageFor(model => model.CityId, "", new {@class = "text-danger"})
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label">İlçe:</label>
+                <div class="col-lg-9">
+                    @Html.DropDownListFor(x => x.DistrictId, Enumerable.Empty<SelectListItem>(), "Seçiniz", new { @class = "form-control", @id = "Districts", @name = "Districts",@disabled = "disabled" })
+                    @Html.ValidationMessageFor(model => model.DistrictId, "", new {@class = "text-danger"})
+                </div>
+            </div>
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+
+        }
+        
+
+    </div>
+</div>
+
+

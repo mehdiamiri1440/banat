@@ -1,0 +1,62 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Machine.MachineAddViewModel
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newMachineForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Yeni Makine Tanımlama Sayfası</strong></h5>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("Add", "Machine", FormMethod.Post))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.AntiForgeryToken()
+
+          
+            <div class="form-group row">
+                <div class="col-lg-4">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Adı</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.Machine.Name, new { @class = "form-control", @placeholder = "Adı" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Kodu</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.Machine.Code, new { @class = "form-control", @placeholder = "Kodu" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-lg-4">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Güç</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.Machine.Power, new { @class = "form-control", @placeholder = "Güç" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Yıl</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.Machine.Date, new { @class = "form-control", @placeholder = "Yıl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+
+        }
+    </div>
+</div>
+
+

@@ -1,0 +1,79 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Machine.MachineListViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newRoleForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Sisteme Kayıtlı Makineler</strong></h5>
+    </div>
+    <div class="card-body">
+
+   
+        <div class="table-responsive">
+            <table class="table datatable-basic" id="machineList">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Makine Adı</th>
+                        <th>Kod</th>
+                        <th>Güç</th>
+                        <th>Yıl</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.MakineListesi)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.Name</td>
+                            <td>@item.Code</td>
+                            <td>@item.Power</td>
+                            <td>@item.Date</td>
+                            <td>
+                                <div class="list-icons">
+                                    <div class="dropdown">
+                                        <a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">
+                                            <i class="icon-menu9"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(22px, 19px, 0px);">
+                                            <a href="/Machine/Update?machineId=@item.Id" class="dropdown-item"><i class="icon-pencil"></i>Güncelle</a>
+                                            <a href="/Machine/Delete?machineId=@item.Id" class="dropdown-item"><i class="icon-cross2"></i>Sil</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+
+@section PageScripts{
+    <script>
+
+
+            window.addEventListener('DOMContentLoaded', (event) => {
+                $.extend($.fn.dataTable.defaults, {
+                    columnDefs: [{
+                        orderable: false,
+                        width: 100,
+                        targets: [4]
+                    }],
+
+                });
+                $('#machineList').DataTable({
+                    "language": {
+                        "url": "/Scripts/dil.json"
+                    }
+                });
+            })
+    </script>
+}

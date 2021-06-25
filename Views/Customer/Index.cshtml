@@ -1,0 +1,199 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+@section PageStyle
+{
+    @*<link href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">*@ 
+    <script src="~/global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+    <script src="~/global_assets/js/plugins/forms/selects/select2.min.js"></script>
+}
+
+@section PageScripts
+{
+
+
+    @*<script src="~/Scripts/datatables_basic.js"></script>*@
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+
+            if (!$().DataTable) {
+                console.warn('Warning - datatables.min.js is not loaded.');
+                return;
+            }
+
+            // Setting datatable defaults
+            $.extend($.fn.dataTable.defaults,
+                {
+                    autoWidth: false,
+                    columnDefs: [
+                        {
+                            orderable: false,
+                            width: 100,
+                            targets: [3]
+                        }
+                    ],
+                    dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
+                    language: {
+                        search: '<span>Ara:</span> _INPUT_',
+                        searchPlaceholder: 'Aranacak Kelime',
+                        lengthMenu: '<span>Sayfada:</span> _MENU_  <span>kayıt göster</span>',
+                        paginate: {
+                            'first': 'First',
+                            'last': 'Last',
+                            'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+                            'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+                        },
+                        sProcessing: ' var light = $("#DataTables_Table_0");' +
+                            '$(light).block({' +
+                            'message: "<i class="icon-spinner spinner"></i> İşleminiz Yapılıyor' +
+                            ',overlayCSS: {' +
+                            'backgroundColor: "#fff"' +
+                            ',opacity: 0.8' +
+                            ',cursor: "wait"},' +
+
+                            'css: {border: 0,padding: 0,backgroundColor: "none"}});',
+                        Decimal: ',',
+                        sInfo:
+                            '_TOTAL_ <span>kayıttan</span> _START_ - _END_ <span>arasındaki kayıtlar gösteriliyor</span>',
+                        sInfoEmpty: 'Kayıt Yok',
+                        sInfoFiltered: '(_MAX_ <span>kayıt içerisinden bulunan<span>)',
+                        sLoadingRecords: ' var light = $("#DataTables_Table_0");' +
+                        '$(light).block({'+
+                            'message: "<i class="icon-spinner spinner"></i> İşleminiz Yapılıyor'+
+                            ',overlayCSS: {'+
+                                'backgroundColor: "#fff"'+
+                                ',opacity: 0.8'+
+                                ',cursor: "wait"},'+
+                            
+                            'css: {border: 0,padding: 0,backgroundColor: "none"}});'
+                    }
+                });
+
+            // Basic datatable
+            $('#DataTables_Table_0').DataTable(
+                {
+                    "ajax": {
+                        'aoColumns': [
+                            { 'sType': 'turkish' },
+                            { 'sType': 'string' }
+                        ],
+                        "url": "/Customer/CustomerList",
+                        "type": "POST",
+                        "datatype": "json"
+                    },
+                    "columns": [
+                        { "data": "CustomerTitle", "name": "CustomerTitle", "width": "50%" },
+                        { "data": "IdentityNo", "name": "IdentityNo", "width": "20%" },
+                        {
+                            "data": "CustomerType",
+                            "searchable": false,
+                            "sortable": false,
+                            "render": function (data) {
+                                console.log(data)
+                                if (data=='B')
+                                    return '<span class="badge badge-info">Bireysel</span>'
+                                else
+                                    return '<span class="badge badge-danger">Kurumsal</span>'
+                            },
+                            "width": "20%"
+                        },
+                        {
+                            "title": "İşlem",
+                            "data": "Id",
+                            "searchable": false,
+                            "sortable": false,
+                            "render": function(data, type, full, meta) {
+                                return '<div class="list-icons">' +
+                                            '<div class="dropdown">' +
+                                                '<a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">' +
+                                                    '<i class="icon-menu9"></i>' +
+                                                '</a>' +
+                                                    '<div class="dropdown-menu dropdown-menu-right" x-placement="top-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(22px, 1px, 0px);">' +
+                                                        '<a href="@Url.Action("UpdateCorporateCustomer", "Customer")?id=' + data + '" class="dropdown-item"><i class="icon-pencil"></i> Güncelle</a>' +
+                                                    '</div>' +
+                                            '</div>' +
+                                        '</div>';
+                            },
+                            "width": "5%"
+                        }
+                    ],
+                    "serverSide": "true",
+                    "processing": "true",
+                    "order": [0, "asc"],
+                    "language": {
+                        "url": "/Scripts/dil.json"
+                    }
+                }
+            );
+
+            // Alternative pagination
+            $('.datatable-pagination').DataTable({
+                pagingType: "simple",
+                language: {
+                    paginate: {
+                        'next': $('html').attr('dir') == 'rtl' ? 'Next &larr;' : 'Next &rarr;',
+                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr; Prev' : '&larr; Prev'
+                    }
+                }
+            });
+
+            // Datatable with saving state
+            $('.datatable-save-state').DataTable({
+                stateSave: true
+            });
+
+            // Scrollable datatable
+            var table = $('.datatable-scroll-y').DataTable({
+                autoWidth: true,
+                scrollY: 300
+            });
+
+            // Resize scrollable table when sidebar width changes
+            $('.sidebar-control').on('click',
+                function() {
+                    table.columns.adjust().draw();
+                });
+
+
+        });
+
+
+    </script>
+}
+    
+    
+
+
+
+<div class="card" id="newRoleForm">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title">Müşteriler</h5>
+    </div>
+
+    <div class="card-body">
+        Sistemde Kayıtlı Bireysel ve Kurumsal Müşterilerinizi Göstermektedir.
+    </div>
+
+<div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+
+    <table class="table datatable-basic dataTable no-footer" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+    <thead>
+        <tr role="row">
+            <th>Müşteri Tanımı</th>
+            <th>Kimlik No</th>
+            <th>Müşteri Türü</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+</div>
+</div>
+
+

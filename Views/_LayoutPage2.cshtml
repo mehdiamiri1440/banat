@@ -1,0 +1,322 @@
+﻿@using System.Web.Optimization
+@using Ginosis.Core.CrossCuttingConcerns.Security
+@using Ginosis.Banat.MvcWebUI.Helpers
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Banat</title>
+    <!-- Global stylesheets -->
+    @Styles.Render("~/bundle/GlobalStylesheets")
+    <!-- /global stylesheets -->
+    <!-- Core JS files -->
+    @Scripts.Render("~/bundle/CoreJsFiles")
+    <!-- /core JS files -->
+    <!-- Theme JS files -->
+    @RenderSection("ThemePageScripts", false)
+    @*<script src="~/assets/js/app.js"></script>*@
+    @Scripts.Render("~/bundle/AppJs")
+
+    @RenderSection("PageScripts", false)
+    @RenderSection("PageStyle", false)
+    <!-- /theme JS files -->
+    <script>
+        $.ajaxSetup({
+            statusCode: {
+                401: function () {
+
+                    // Redirec the to the login page.
+                    location.href = "./login.cfm";
+
+                }
+            }
+        });
+    </script>
+</head>
+<body class="navbar-top sidebar-xs">
+    <!-- Main navbar -->
+    <div class="navbar navbar-expand-md navbar-dark fixed-top">
+        <div class="navbar-brand" style="background-image:url('/assets/images/banatlogoheader2.png'); background-repeat: no-repeat; background-size: 175px 45px">
+            @*<a href="@Url.Action("Index", "DashBoard")" class="d-inline-block">
+                    <img src="~/assets/images/header.png" alt="">
+                </a>*@
+        </div>
+        <div class="d-md-none">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-mobile">
+                <i class="icon-tree5"></i>
+            </button>
+            <button class="navbar-toggler sidebar-mobile-main-toggle" type="button">
+                <i class="icon-paragraph-justify3"></i>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-mobile">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="#" class="navbar-nav-link sidebar-control sidebar-main-toggle d-none d-md-block">
+                        <i class="icon-paragraph-justify3"></i>
+                    </a>
+                </li>
+
+            </ul>
+            <span class="navbar-text ml-md-3 mr-md-auto">
+                @*<span class="badge bg-success">Online</span>*@
+            </span>
+            <ul class="navbar-nav">
+
+                <li class="nav-item dropdown dropdown-user">
+                    <a href="#" class="navbar-nav-link dropdown-toggle" data-toggle="dropdown">
+                        <img src="~/global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" alt="">
+                        <span>@Html.NameSurname()</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        @*<a href="#" class="dropdown-item"><i class="icon-user-plus"></i> Profilim</a>
+                             <a href="#" class="dropdown-item"><i class="icon-comment-discussion"></i> Mesajlarım <span class="badge badge-pill bg-blue ml-auto">58</span></a>
+                            <div class="dropdown-divider"></div>*@
+                        <a href="@Url.Action("AccountSettings", "Account")" class="dropdown-item"><i class="icon-cog5"></i> Hesap Ayarları</a>
+                        <a href="@Url.Action("LogOff", "Account")" class="dropdown-item"><i class="icon-switch2"></i> Oturumu Kapat</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- /main navbar -->
+    <!-- Page content -->
+    <div class="page-content">
+        <!-- Main sidebar -->
+        <div class="sidebar sidebar-dark sidebar-main sidebar-expand-md">
+            <!-- Sidebar mobile toggler -->
+            <div class="sidebar-mobile-toggler text-center">
+                <a href="#" class="sidebar-mobile-main-toggle">
+                    <i class="icon-arrow-left8"></i>
+                </a>
+                Navigation
+                <a href="#" class="sidebar-mobile-expand">
+                    <i class="icon-screen-full"></i>
+                    <i class="icon-screen-normal"></i>
+                </a>
+            </div>
+            <!-- /sidebar mobile toggler -->
+            <!-- Sidebar content -->
+            <div class="sidebar-content">
+                <!-- User menu -->
+                <div class="sidebar-user">
+                    <div class="card-body">
+                        <div class="media">
+                            <div class="mr-3">
+                                <a href="#"><img src="~/global_assets/images/placeholders/placeholder.jpg" width="38" height="38" class="rounded-circle" alt=""></a>
+                            </div>
+                            <div class="media-body">
+                                <div class="media-title font-weight-semibold">@Html.NameSurname()</div>
+                                <div class="font-size-xs opacity-50">
+                                    @Html.UserTitle()
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /user menu -->
+                <!-- Main navigation -->
+                <div class="card card-sidebar-mobile">
+                    <ul class="nav nav-sidebar" data-nav-type="accordion">
+                        <!-- Main -->
+                        <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Genel Görünüm</div> <i class="icon-menu" title="Genel Görünüm"></i></li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "DashBoard")" class="nav-link">
+                                <i class="icon-home4"></i>
+                                <span>
+                                    Ana Sayfa
+                                    @*<span class="d-block font-weight-normal opacity-50">No active orders</span>*@
+                                </span>
+                            </a>
+                        </li>
+
+                        <!-- /main -->
+                    </ul>
+                    <ul class="nav nav-sidebar" data-nav-type="accordion">
+                        <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Modüller</div> <i class="icon-menu" title="Modüller"></i></li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-pencil7"></i> <span>Üretim Planlama</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Planlama İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("AcceptMonthlyPlan", "Plan")" class="nav-link active">Aylık Genel Plan</a></li>
+                                <li class="nav-item"><a href="@Url.Action("MonthlyPlan", "Plan")" class="nav-link">Makineye Göre Detay Plan</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-task"></i> <span>İş Emri</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="İş Emri İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("WorkOrderList", "WorkOrder")" class="nav-link">İş Emri Listesi</a></li>
+                                <li class="nav-item"><a href="@Url.Action("DailyWorkOrder", "WorkOrder")" class="nav-link">Günlük İş Emirlerim</a></li>
+                                <li class="nav-item"><a href="@Url.Action("UpdateWorkOrderDetail", "WorkOrder")" class="nav-link">Barkod ile İş Emri Getir</a></li>
+
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-calculator"></i> <span>Yarı Mamul</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Yarı Mamul işlemleri">
+                                <li class="nav-item"><a href="@Url.Action("Add", "SemiProduct")" class="nav-link">Yeni Yarımamul Girişi</a></li>
+                                <li class="nav-item"><a href="@Url.Action("Index", "SemiProduct")" class="nav-link">Yarımamul Listesi</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-subscript"></i> <span>Karışım</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Karışım İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("Add", "Mixture")" class="nav-link">Yeni Karışım Girişi</a></li>
+                                <li class="nav-item"><a href="@Url.Action("Index", "Mixture")" class="nav-link">Karışım Listesi</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-key"></i> <span>Bileşen</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Bileşen İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("Add", "Component")" class="nav-link">Yeni Bileşen Girişi</a></li>
+                                <li class="nav-item"><a href="@Url.Action("Index", "Component")" class="nav-link">Bileşen Listesi</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-store"></i> <span>Makine</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Makine İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("Add", "Machine")" class="nav-link">Yeni Makine Girişi</a></li>
+                                <li class="nav-item"><a href="@Url.Action("Index", "Machine")" class="nav-link">Makine Listesi</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-pencil-ruler"></i> <span>Kalıp</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Kalıp İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("Add", "Mold")" class="nav-link active">Yeni Kalıp Tanım</a></li>
+                                <li class="nav-item"><a href="@Url.Action("Index", "Mold")" class="nav-link">Kalıp Listesi</a></li>
+
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-sidebar" data-nav-type="accordion">
+                        <li class="nav-item-header"><div class="text-uppercase font-size-xs line-height-xs">Sistem</div> <i class="icon-menu" title="Sistem Yönetimi"></i></li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-users"></i> <span>Personel</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Personel İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("NewUser", "Account")" class="nav-link active">Yeni Personel</a></li>
+                                <li class="nav-item"><a href="@Url.Action("Index", "User")" class="nav-link">Personel Listesi</a></li>
+                                <li class="nav-item"><a href="@Url.Action("RecoverPass", "User")" class="nav-link">Parola Sıfırla</a></li>
+                                @*<li class="nav-item"><a href="@Url.Action("Index", "Role")" class="nav-link">Rol Yönetimi</a></li>
+                <li class="nav-item"><a href="@Url.Action("Index", "Authority")" class="nav-link">Yetki Yönetimi</a></li>*@
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-alarm"></i> <span>Vardiya</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Vardiya İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("Index", "Shift")" class="nav-link">Vardiya Listesi</a></li>
+                            </ul>
+                        </li>
+                        @*<li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="mi-block"></i> <span>Parametre </span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Duruş Tipi İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("Index", "StopType")" class="nav-link">Duruş Tipi Listesi</a></li>
+                                <li class="nav-item"><a href="@Url.Action("Add", "StopType")" class="nav-link">Yeni Duruş Tipi Girişi</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="mi-delete"></i> <span>Parametre</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Fire Tipi İşlemleri">
+                                <li class="nav-item"><a href="@Url.Action("Index", "WasteType")" class="nav-link">Fire Tipi Listesi</a></li>
+                                <li class="nav-item"><a href="@Url.Action("Add", "WasteType")" class="nav-link">Yeni Fire Tipi Girişi</a></li>
+                            </ul>
+                        </li>*@
+
+                        <li class="nav-item nav-item-submenu">
+                            <a href="#" class="nav-link"><i class="icon-cube3"></i> <span>Parametre Yönetimi</span></a>
+                            <ul class="nav nav-group-sub" data-submenu-title="Duruş Tipi" style="display: none;">
+                                <li class="nav-item nav-item-submenu">
+                                    <a href="#" class="nav-link">Duruş Tipi</a>
+                                    <ul class="nav nav-group-sub" style="display: none;">
+                                        <li class="nav-item"><a href="@Url.Action("Index", "StopType")" class="nav-link">Duruş Tipi Listesi</a></li>
+                                        <li class="nav-item"><a href="@Url.Action("Add", "StopType")" class="nav-link">Yeni Duruş Tipi Girişi</a></li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item nav-item-submenu">
+                                    <a href="#" class="nav-link">Fire Tipi</a>
+                                    <ul class="nav nav-group-sub">
+                                        <li class="nav-item"><a href="@Url.Action("Index", "WasteType")" class="nav-link">Fire Tipi Listesi</a></li>
+                                        <li class="nav-item"><a href="@Url.Action("Add", "WasteType")" class="nav-link">Yeni Fire Tipi Girişi</a></li>
+                                    </ul>
+                                </li>
+                                
+                            </ul>
+                        </li>
+
+                        @*<li class="nav-item nav-item-submenu">
+            <a href="#" class="nav-link"><i class="icon-lifebuoy mr-3"></i> <span>Destek</span></a>
+            <ul class="nav nav-group-sub" data-submenu-title="Layouts">
+                <li class="nav-item"><a href="@Url.Action("Add", "Support")" class="nav-link">Yeni Talep Oluştur</a></li>
+                <li class="nav-item"><a href="@Url.Action("Index", "Support")" class="nav-link active">Destek Talepleriniz</a></li>
+            </ul>
+        </li>*@
+                    </ul>
+
+                </div>
+                <!-- /main navigation -->
+            </div>
+            <!-- /sidebar content -->
+
+        </div>
+        <!-- /main sidebar -->
+        <!-- Main content -->
+        <div class="content-wrapper">
+            <!-- Page header -->
+            @if (ViewData["MenuTitle"] == null)
+            {
+                ViewData["MenuTitle"] = "BanatPortal";
+
+            }
+            @if (ViewData["SubMenuTitle"] == null)
+            {
+                ViewData["SubMenuTitle"] = "";
+            }
+            <div class="page-header page-header-light">
+                <div class="page-header-content header-elements-md-inline">
+                    <div class="page-title d-flex">
+                        <h4><span class="font-weight-semibold">@ViewData["MenuTitle"].ToString()</span> - @ViewData["SubMenuTitle"].ToString()</h4>
+                        <a href="#" class="header-elements-toggle text-default d-md-none"><i class="icon-more"></i></a>
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- /page header -->
+            <!--Content area -->
+            <div class="content" id="layoutContent">
+                <div id="userMsj"></div>
+                @{ Html.RenderPartial("_Alerts"); }
+                @RenderBody()
+            </div>
+            <!-- /Content area -->
+            <!-- Footer -->
+            @*<div class="navbar navbar-expand-lg navbar-light">
+                    <div class="text-center d-lg-none w-100">
+                        <button type="button" class="navbar-toggler dropdown-toggle" data-toggle="collapse" data-target="#navbar-footer">
+                            <i class="icon-unfold mr-2"></i>
+                            Footer
+                        </button>
+                    </div>
+
+                    <div class="navbar-collapse collapse" id="navbar-footer">
+                        <span class="navbar-text">
+                            &copy; 2015 - 2018. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov" target="_blank">Eugene Kopyov</a>
+                        </span>
+
+                        <ul class="navbar-nav ml-lg-auto">
+                            <li class="nav-item"><a href="https://kopyov.ticksy.com/" class="navbar-nav-link" target="_blank"><i class="icon-lifebuoy mr-2"></i> Support</a></li>
+                            <li class="nav-item"><a href="http://demo.interface.club/limitless/docs/" class="navbar-nav-link" target="_blank"><i class="icon-file-text2 mr-2"></i> Docs</a></li>
+                            <li class="nav-item"><a href="https://themeforest.net/item/limitless-responsive-web-application-kit/13080328?ref=kopyov" class="navbar-nav-link font-weight-semibold"><span class="text-pink-400"><i class="icon-cart2 mr-2"></i> Purchase</span></a></li>
+                        </ul>
+                    </div>
+                </div>*@
+            <!-- /footer -->
+        </div>
+        <!-- /main content -->
+    </div>
+
+</body>
+</html>

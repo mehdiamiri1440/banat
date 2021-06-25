@@ -1,0 +1,31 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Authority.AuthorityAddViewModel
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newRoleForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Yeni İşlem Yetkisi</strong></h5>
+    </div>
+    
+    <div class="card-body">
+        @using (Html.BeginForm("Add", "Authority", FormMethod.Post))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="Type">Adı</label>
+                @Html.TextBoxFor(x => x.Authority.AuthorityName, new { @class = "form-control", @placeholder = "Adı" })
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+
+        }
+    </div>
+
+
+</div>

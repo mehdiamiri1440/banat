@@ -1,0 +1,144 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+@section PageScripts
+{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            GetUserList();
+        });
+
+
+        function begin() {
+            var light = $("#customerForm");
+            $(light).block({
+                message: '<i class="icon-spinner spinner"></i> İşleminiz Yapılıyor',
+                overlayCSS: {
+                    backgroundColor: '#fff',
+                    opacity: 0.8,
+                    cursor: 'wait'
+                },
+                css: {
+                    border: 0,
+                    padding: 0,
+                    backgroundColor: 'none'
+                }
+            });
+        }
+
+        function success(result) {
+            var light = $("#customerForm");
+            var jsonData = JSON.parse(result.ResultValue);
+            for (var i = 0; i < jsonData.length; i++) {
+                var users = jsonData[i];
+                console.log(users.UserName);
+            }
+            $(light).unblock();
+            $("#userMsj")
+                .append(
+                    "<div class='alert bg-success text-white alert-styled-left alert-dismissible'> <span class='font-weight-semibold'>Onay! </span>" +
+                    result.ReturnMessage +
+                    "</div>");
+        }
+
+        function complete(result) {
+            var light = $("#customerForm");
+            $(light).unblock();
+        }
+
+        function failure(result) {
+            var light = $("#customerForm");
+            $(light).unblock();
+            $("#userMsj").append("<p>İşlem Hatalı...</p>");
+        }
+
+        function GetUserList() {
+            $.ajax({
+                type: 'GET',
+                url: '/User/UserList',
+                data: '',
+                //data: { identityNumber: $('#IdentityNumber').val(), customerName: $('#Name').val(), customerSurName: $('#Surname').val(), birthYear: $('#Year').val() },
+                cache: false,
+                success: function(result) {
+                    var jsonData = JSON.parse(result.ResultValue);
+                    var row = "";
+                    for (var i = 0; i < jsonData.length; i++) {
+                        var users = jsonData[i];
+                        console.log(users.UserName);
+                        row += "<tr><td>" + users.FirstName + "</td><td>" + users.LastName + "</td><td>" + users.Email + "</td><td>" + users.FirstName + "</td><td>" + users.LastName + "</td>" +
+                            "<td>" +
+                            "<div class='list-icons'><a href='#' class='list-icons-item text-primary-600'><i class='icon-pencil7'></i></a>"+
+                            "<a href='#' class='list-icons-item text-danger-600'><i class='icon-trash'></i></a>"+
+                            "<a href='#' class='list-icons-item text-teal-600'><i class='icon-cog6'></i></a>"+
+                            "</div>"+
+                            "</td>" +
+                            "</tr>";
+                    }
+                    var pageContent = "";
+                    for (var j = 1; j <= result.TotalNumberOfRecords; j++) {
+
+                        pageContent += " <li class='page-item'><a href='javascript:GetPageData("+j+");' class='page-link'>" + j + "</a></li>";
+                    }
+                    $("#tblUserList tbody").html(row);
+                    
+                    $("#ulPage").html(pageContent); 
+                }
+            });
+        }
+
+        function GetPageData(pageNumber) {
+            alert(pageNumber);
+        }
+    </script>
+}
+
+<div class="card" id="userList">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Kullanıcılar</strong></h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="tblUserList">
+                <thead>
+                <tr>
+                    <th>Adı</th>
+                    <th>Soyadı</th>
+                    <th>Email</th>
+                    <th>İşlemler</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            
+        </div>
+        
+    </div>
+    <div class="card card-body ">
+        <ul class="pagination align-self-end" id="ulPage">
+            @*<li class="page-item"><a href="#" class="page-link">← &nbsp; Prev</a></li>
+        <li class="page-item active"><a href="#" class="page-link">1</a></li>
+        <li class="page-item"><a href="#" class="page-link">2</a></li>
+        <li class="page-item disabled"><a href="#" class="page-link">3</a></li>
+        <li class="page-item"><a href="#" class="page-link">4</a></li>
+        <li class="page-item"><a href="#" class="page-link">Next &nbsp; →</a></li>*@
+        </ul>
+    </div>
+    
+   
+</div>
+@*<div class="card card-body ">
+    <ul class="pagination align-self-end" id="ulPage">
+        <li class="page-item"><a href="#" class="page-link">← &nbsp; Prev</a></li>
+        <li class="page-item active"><a href="#" class="page-link">1</a></li>
+        <li class="page-item"><a href="#" class="page-link">2</a></li>
+        <li class="page-item disabled"><a href="#" class="page-link">3</a></li>
+        <li class="page-item"><a href="#" class="page-link">4</a></li>
+        <li class="page-item"><a href="#" class="page-link">Next &nbsp; →</a></li>
+    </ul>
+</div>*@

@@ -1,0 +1,45 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.Component.ComponentUpdateViewModel
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="updateComponentForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Bileşen Güncelleme Sayfası</strong></h5>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("Update", "Component", FormMethod.Post))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.AntiForgeryToken()
+
+            <div class="form-group row">
+                <div class="col-lg-4">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Adı</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.Component.Name, new { @class = "form-control", @placeholder = "Adı" })
+                            @Html.HiddenFor(x => x.Component.Id)
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Kodu</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.Component.Code, new { @class = "form-control", @placeholder = "Kodu", maxLength = "9" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+
+        }
+    </div>
+</div>
+
+

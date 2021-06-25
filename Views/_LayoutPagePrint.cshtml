@@ -1,0 +1,60 @@
+﻿@using System.Web.Optimization
+@using Ginosis.Core.CrossCuttingConcerns.Security
+@using Ginosis.Banat.MvcWebUI.Helpers
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Banat</title>
+    <!-- Global stylesheets -->
+    @Styles.Render("~/bundle/GlobalStylesheets")
+    <!-- /global stylesheets -->
+    <!-- Core JS files -->
+    @Scripts.Render("~/bundle/CoreJsFiles")
+    <!-- /core JS files -->
+    <!-- Theme JS files -->
+    @RenderSection("ThemePageScripts", false)
+    @*<script src="~/assets/js/app.js"></script>*@
+    @Scripts.Render("~/bundle/AppJs")
+
+    @RenderSection("PageScripts", false)
+    @RenderSection("PageStyle", false)
+    <!-- /theme JS files -->
+    <script>
+        $.ajaxSetup({
+            statusCode: {
+                401: function () {
+
+                    // Redirec the to the login page.
+                    location.href = "./login.cfm";
+
+                }
+            }
+        });
+    </script>
+</head>
+<body  style="background-color:white">
+ 
+    <div class="page-content">
+   
+        <!-- Main content -->
+        <div class="content-wrapper">
+           
+           
+            <!--Content area -->
+            <div class="content" id="layoutContent">
+                <div id="userMsj"></div>
+                @{ Html.RenderPartial("_Alerts"); }
+                @RenderBody()
+            </div>
+          
+        </div>
+        
+    </div>
+
+</body>
+</html>

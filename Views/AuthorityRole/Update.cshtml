@@ -1,0 +1,44 @@
+﻿@model List<Ginosis.Banat.Entities.Concrete.Concrete.DTOs.AuthorityDTO>
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card" id="newRoleForm">
+    <div class="card-header bg-white header-elements-inline">
+        <h5 class="card-title"><strong>Role Yetki Tanımlama</strong></h5>
+    </div>
+    
+    @using (Html.BeginForm())
+    {
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-responsive table-striped">
+                <tr>
+                    <th>Rol</th>
+                    <th>Durumu</th>
+                </tr>
+                @for (int i = 0; i < Model.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            @Html.HiddenFor(it => it[i].Id)
+                            @Html.DisplayFor(it => it[i].AuthorityName)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(it => it[i].IsChecked, new { Style = "vertical-align:3px}" })
+                        </td>
+                    </tr>
+
+                }
+            </table>
+
+        </div>
+
+        <div class="text-right">
+            <button type="submit" class="btn btn-primary">Güncelle</button>
+        </div>
+    }
+
+
+</div>

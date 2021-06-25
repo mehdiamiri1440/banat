@@ -1,0 +1,182 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.WorkOrder.ViewWorkOrderDetailViewModel
+@{
+    ViewBag.Title = "WrkOrdDetail";
+    Layout = "~/Views/_LayoutPagePrint.cshtml";
+}
+@section PageScripts{
+    @*<script>
+            $(document).ready(function () {
+                window.print();
+            });
+
+        </script>*@
+}
+@section PageStyle{
+    <style>
+        table, tr, td, th, tbody, thead, tfoot {
+            page-break-inside: avoid !important;
+        }
+    </style>
+}
+
+
+<input type="hidden" id="WorkOrderId" />
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-xs table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="4" class="text-center">
+                            <span class="font-weight-bold">ENJEKSİYON OPERASYONU İŞ EMRİ</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="font-weight-bold">İş Emri No</span></td>
+                        <td>@Model.WorkOrderId</td>
+                        <td><span class="font-weight-bold">Tarih</span></td>
+                        <td>@Model.WorkOrderDate.ToShortDateString()</td>
+
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Makine Press Kodu</span></td>
+                        <td>@Model.MachineName</td>
+                        <td><span class="font-weight-bold">Vardiya</span></td>
+                        <td>@Model.ShiftName</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Makine Adı</span></td>
+                        <td>@Model.MachineType</td>
+                        <td><span class="font-weight-bold">Duruş Zamanı(Dk)</span></td>
+                        <td>@Model.TotalStoppedTime</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Kalıp Kodu</span></td>
+                        <td>@Model.MoldCode</td>
+                        <td><span class="font-weight-bold">Seri Başı Tarihi</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Kalıp Adı</span></td>
+                        <td>@Model.MoldName</td>
+                        <td rowspan="3" colspan="2"><img src="/WorkOrder/CreateBarcode?wrkOrdId=@Model.WorkOrderProductCode" width="100" height="100" /></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="font-weight-bold">Operatör</span>
+                        </td>
+                        <td>
+                            @string.Format(Model.EmployeeName)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Ürün Kodu</span></td>
+                        <td>@Model.SemiProductByWorkOrderDto.SemiProductCode</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-xs table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="5">
+                            <h1 class="mb-0 font-weight-bold">@Model.SemiProductByWorkOrderDto.SemiProductName</h1>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td><span class="font-weight-bold">Lot1 Etiket No</span></td>
+                        <td colspan="2"></td>
+                        <td><span class="font-weight-bold">Fire Miktarı(KG)</span></td>
+                        <td>@Model.TotalWasteAmount</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><span class="font-weight-bold">Planlanan Miktar</span></td>
+                        <td><span class="font-weight-bold">Adet</span></td>
+                        <td><span class="font-weight-bold">Kg</span></td>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td>@Model.SemiProductByWorkOrderDto.PlanedAmound</td>
+                        <td>@Model.SemiProductByWorkOrderDto.PlanedWeight </td>
+                        <td><span class="font-weight-bold">Yolluk Miktarı (KG)</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Gerçekleşen Miktar</span></td>
+                        <td colspan="4">@Model.SemiProductByWorkOrderDto.CompletedAmound</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Kalıp Göz Sayısı</span></td>
+                        <td colspan="4">@Model.MoldCellAmount</td>
+                    </tr>
+                    <tr>
+                        <td><span class="font-weight-bold">Toplam Çevrim Zamanı</span></td>
+                        <td colspan="4">@Model.CevrimZamani</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-xs table-bordered" id="Detail">
+                <thead>
+                    <tr>
+                        <th>Malzeme Kodu</th>
+                        <th>Malzeme Adı</th>
+                        <th>Oran</th>
+                        <th>Sarfiyat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item2 in Model.SemiProductByWorkOrderDto.mixBySemiProductDtos)
+                    {
+                        <tr class="table-active table-border-double">
+                            <td colspan="2" class="font-weight-bold">@item2.DisplayName</td>
+                            <td><h6 class="font-weight-bold mb-0">@item2.Rate</h6></td>
+                            @{
+                                string rt = (@item2.Rate.ToString().Replace(".", ","));
+                                decimal srf = (@Model.SemiProductByWorkOrderDto.PlanedWeight * decimal.Parse(rt)) / 100;
+                            }
+                            <td>@srf</td>
+                        </tr>
+
+                        foreach (var item3 in item2.componentByMixIdDtos)
+                        {
+                            <tr>
+                                <td><span class="text-muted">@item3.ComponentCode</span></td>
+                                <td><span class="text-success-600">@item3.ComponentName</span></td>
+                                <td><h6 class="mb-0 text-green">@item3.ComponentRate</h6></td>
+                                @{ decimal krsmSarf = (@srf * decimal.Parse(@item3.ComponentRate.ToString().Replace(".", ","))) / 100;}
+                                <td>@krsmSarf</td>
+                            </tr>
+                        }
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+@*<tr>
+        <td><span class="font-weight-bold">Üretilecek Tarih</span></td>
+        <td>@Model.WorkOrderDate.ToShortDateString()</td>
+        <td><span class="font-weight-bold">Üretilecek Miktar</span></td>
+        <td>@Model.SemiProductByWorkOrderDto.PlanedAmound</td>
+    </tr>*@

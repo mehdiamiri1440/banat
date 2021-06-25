@@ -1,0 +1,281 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.WorkOrder.ViewWorkOrderDetailViewModel
+@{
+    ViewBag.Title = "NewTask";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+@Html.HiddenFor(x => x.WorkOrderProductId)
+<div class="card" id="workOrder">
+    <div class="card-body">
+        <div class="media mb-3">
+            <a href="#" class="mr-3 align-self-center">
+                <img src="../../../../global_assets/images/placeholders/placeholder.jpg" class="rounded" width="44" height="44" alt="">
+            </a>
+            <h3 class="mb-0 font-weight-bold">@Model.SemiProductByWorkOrderDto.SemiProductName</h3>
+            <input type="hidden" id="DetailPlanId" />
+            <div class="media-body">
+                <h5 class="media-title font-weight-semibold" id="SemiProductName"></h5>
+                <ul class="list-inline list-inline-dotter text-muted mb-0">
+                    <li class="list-inline-item" id="SemiProductDetailInfo"></li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="mb-4">
+            @*<h6 class="font-weight-semibold" id="workOrderDetail">İş Emri Detayı</h6>*@
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Üretilecek Tarih:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger" id="ProduceDate" name="ProduceDate">
+                                @Model.WorkOrderDate.ToString("dd-MMM-yyyy")
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Vardiya:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label" id="ShiftCode" name="ShiftCode">
+                                @Model.ShiftName
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Makine Press Kodu:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label" id="MachineCode" name="MachineCode">
+                                @string.Format("{0}", Model.MachineName)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Makina Adı:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label" id="employee" name="employee">
+                                @string.Format("{0}", Model.MachineType)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Kalıp Kodu:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label" id="MachineCode" name="MachineCode">
+                                @string.Format("{0}", Model.MoldCode)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Kalıp Adı:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label" id="employee" name="employee">
+                                @string.Format("{0}", Model.MoldName)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Personel:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger" id="employee" name="employee">
+                                @Model.EmployeeName
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Ürün Kodu:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger" id="employee" name="employee">
+                                @Model.SemiProductByWorkOrderDto.SemiProductCode
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-sm-flex">
+
+            <div class="ml-sm-auto mt-2 mt-sm-0">
+                <a href="#" onclick="Print()" class="btn btn-success">
+                    <i class="icon-printer mr-2"></i>
+                    Yazdır
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="card" id="workOrderProduct">
+    <div class="card-body">
+
+        <div class="mb-4">
+            @*<h6 class="font-weight-semibold" id="workOrderDetail">Ürün Detayı</h6>*@
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Yarımamul Kodu:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label">
+                                @Model.SemiProductByWorkOrderDto.SemiProductCode
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Yarımamul Adı:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger">
+                                @Model.SemiProductByWorkOrderDto.SemiProductName
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Planlanan Adet:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label">
+                                @Model.SemiProductByWorkOrderDto.PlanedAmound
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Planlanan Ağırlık:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger">
+                                @Model.SemiProductByWorkOrderDto.PlanedWeight
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Gerçekleşen Adet:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger">
+                                @Model.SemiProductByWorkOrderDto.CompletedAmound
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Gerçekleşen Ağırlık:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger">
+                                @Model.SemiProductByWorkOrderDto.CompletedWeight
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Fire Miktarı:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger">
+                                @Model.TotalWasteAmount
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group row">
+                        <label class="col-lg-3 col-form-label">Duruş Zamanı:</label>
+                        <div class="col-lg-9">
+                            <label type="text" class="col-form-label text-danger">
+                                @Model.TotalWasteAmount
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="card" id="workOrderPrdDtl">
+    <div class="table-responsive">
+        <table class="table text-nowrap" id="Detail">
+            <thead>
+                <tr>
+                    <th>Malzeme Kodu</th>
+                    <th>Malzeme Adı</th>
+                    <th>Oran</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item2 in Model.SemiProductByWorkOrderDto.mixBySemiProductDtos)
+                {
+                    <tr class="table-active table-border-double">
+                        <td colspan="2" class="font-weight-bold">@item2.DisplayName</td>
+                        <td><h6 class="font-weight-bold mb-0">@item2.Rate</h6></td>
+                    </tr>
+
+                    foreach (var item3 in item2.componentByMixIdDtos)
+                    {
+                        <tr>
+                            <td><span class="text-muted">@item3.ComponentCode</span></td>
+                            <td><span class="text-success-600">@item3.ComponentName</span></td>
+                            <td><h6 class="mb-0 text-green">@item3.ComponentRate</h6></td>
+                        </tr>
+                    }
+
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section PageScripts{
+
+    <script>
+        function Print() {
+            var id = $('#WorkOrderProductId').val();
+            var url='@Url.Action("Print", "WorkOrder")?id=' + id;
+            window.open(url, '_blank');
+        }
+    </script>
+
+}
+

@@ -1,0 +1,394 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.WorkOrder.WorkOrderListViewModel
+@{
+    ViewBag.Title = "NewTask";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+@using (Html.BeginForm("WorkOrderList", "WorkOrder", FormMethod.Post))
+{
+
+    <div class="card">
+        <div class="card-header header-elements-inline">
+            <h6 class="card-title">İş Emri Oluştur</h6>
+        </div>
+        <div class="card-body">
+            <div class="form-group row">
+                <div class="col-lg-2">
+                    <div class="row">
+                        <label class="col-md-4 col-form-label">Tarih:</label>
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(x => x.WorkOrderDate, new { @placeholder = "Tarih", @class = "form-control dpicker", @name = "WorkOrderDate", @id = "WorkOrderDate", @autocomplete = "off" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="row">
+                        <label class="col-md-4 col-form-label">Vardiya:</label>
+                        <div class="col-md-8">
+                            @Html.DropDownListFor(x => x.SelectedShiftId, new SelectList(Model.ShiftList, "Id", "Name"), "Seçiniz", new { @class = "form-control select-access-value", @id = "SelectedShiftId", @name = "SelectedShiftId" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="row">
+                        <label class="col-md-4 col-form-label">Makine:</label>
+                        <div class="col-md-8">
+                            @Html.DropDownListFor(x => x.SelectedMachineId, new SelectList(Model.MachineList, "Id", "Name"), "Seçiniz", new { @class = "form-control select-access-value", @id = "SelectedMachineId", @name = "SelectedMachineId" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <button type="button" class="btn btn-primary col-md-12" id="getWorkOrderList"><i class="icon-search4 font-size-base mr-2"></i>Listele</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="card" id="workorderlist">
+        <div class="card-header header-elements-sm-inline">
+            <h5 class="card-title"><strong>Görevler</strong></h5>
+            <div class="header-elements">
+                <a href="#" class="btn bg-success-400" id="printAllWorkOrder" name="printAllWorkOrder"><i class="icon-printer mr-2"></i> Yazdır</a>
+            </div>
+        </div>
+        <div class="card-body">
+
+            <table class="table datatable-basic" id="WorkOrderList">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Üretilecek Tarih</th>
+                        <th>Makina</th>
+                        <th>Vardiya</th>
+                        <th>Personel</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model.WorkOrderListDtos)
+                    {
+                        <tr>
+                            <td>@item.WorkOrderProductId</td>
+                            <td>@item.PlannedDate.Value.ToString("dd/MM/yyyy")</td>
+                            <td>@item.MachineName</td>
+                            <td>@item.ShiftName</td>
+                            <td>@item.EmployeeName @item.EmployeeSurName</td>
+
+                            <td class="text-center">
+                                <div class="list-icons">
+                                    <div class="dropdown">
+                                        <a href="#" class="list-icons-item" data-toggle="dropdown" aria-expanded="false">
+                                            <i class="icon-menu9"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(22px, 19px, 0px);">
+                                            <a href="/WorkOrder/ViewWorkOrderDetail?workOrderProductId=@item.WorkOrderProductId" class="dropdown-item"><i class="icon-search4"></i>Görüntüle</a>
+                                            <a href="/WorkOrder/ViewWorkOrderDetailPrint?workOrderProductId=@item.WorkOrderProductId" class="dropdown-item"><i class="icon-printer"></i>Yazdır</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+}
+
+<div class="modal fade" id="pdfModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="prdNameModalLabel">Planlandığı Makinalar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <object id='pdfbox' type="application/pdf" style="width: 600px; height: 400px;border: 5px solid #ccc;" data="@Url.Action("GeneratePDF", "WorkOrder")">
+                </object>
+                Click @Html.ActionLink("Tıklayınız", "GeneratePDF", "WorkOrder", new { target = "_blank" }) to view the file.
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section PageScripts{
+
+    @*<script src="~/assets/js/GinosisCore/bootstrap-datepicker.TR.js"></script>*@
+<script>
+
+
+
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+
+            $('#workOrder').hide();
+            $('#workOrderPrdDtl').hide();
+
+            $('.select-search').select2();
+
+            $('#printAllWorkOrder').click(function () {
+                var selectedDate = $('#WorkOrderDate').val();
+                var machine = $('#SelectedMachineId').val();
+                var shift = $('#SelectedShiftId').val();
+                //var dark = $('#layoutContent');
+                if (selectedDate == "") {
+                    swal({
+                        title: 'Hata',
+                        text: 'Lütfen tarih seçiniz',
+                        type: 'error',
+                        buttonsStyling: false,
+                        confirmButtonClass: 'btn btn-primary',
+                    });
+                    return;
+                }
+
+                swal({
+                    title: 'Dikkat',
+                    text: "Listelenen iş emirlerini yazdırmak istediğinize emin misiniz?",
+                    type: 'warning',
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger',
+                    cancelButtonText: 'Hayır',
+                    confirmButtonText: 'Evet',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value) {
+                        showloading("Belgeler Oluşturuluyor");
+                        var model = {
+                            selectedDate: selectedDate,
+                            shiftId: shift,
+                            machineId: machine
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/WorkOrder/PrintWorkOrder",
+                            data: model,
+                            success: function (data, status) {
+                                endloading();
+                                var docName=data.result.ResultValue;
+                                swal({
+                                    title: 'Onay!',
+                                    text: 'İşlem Başarıyla Tamamlandı',
+                                    type: 'success',
+                                    buttonsStyling: false,
+                                    confirmButtonClass: 'btn btn-primary',
+                                    confirmButtonText: 'Tamam'
+                                }).then((result) => {
+                                    if (result.value) {
+                                       
+                                        debugger;
+                                        var url = '@Url.Action("GeneratePDF", "WorkOrder")?fileName=' + docName;
+                                        window.open(url, "_blank");
+                                        //window.location.href = url;
+                                    }
+                                });
+
+                            },
+                            error: function (data, status) {
+                                endloading();
+                                swal({
+                                    title: 'Onay!',
+                                    text: 'İşlem Hatalı.Sistem Yöneticisine İletiniz',
+                                    type: 'error',
+                                    buttonsStyling: false,
+                                    confirmButtonClass: 'btn btn-primary',
+                                    confirmButtonText: 'Tamam'
+                                });
+                            }
+
+                        })
+
+                    }
+                });
+
+
+            });
+
+            $('#getWorkOrderList').click(function () {
+                var date = $('#WorkOrderDate').val();
+                var machine = $('#SelectedMachineId').val();
+                var shift = $('#SelectedShiftId').val();
+                var url = "/WorkOrder/WorkOrderList?date=" + date + "&shiftId=" + shift + "&machineId=" + machine;
+                window.location.href = url;
+            });
+            $('#assignToEmployee').click(function () {
+
+                swal({
+                    title: `Dikkat!`,//`My name is ${person.name}.`,
+                    //text:
+                    type: 'info',
+                    html: '<span class="font-weight-semibold">' + $('#SemiProductName').text() + '</span> ürünü için <span class="text-dander font-weight-semibold">' + $('#planedAmount').text() + " Adet</span> Üretim Görevini <span class='text-danger font-weight-semibold'>" + $('#UserId option:selected').text() + " </span> isimli operatöre  atamak istediğinize emin misiniz?",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger',
+                    cancelButtonText: 'Hayır',
+                    confirmButtonText: 'Evet',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.value) {
+                        alert($('#DetailPlanId').val());
+                        $.ajax({
+                            type: "GET",
+                            url: "/WorkOrder/AssignTask",
+                            contentType: "application/json; charset=utf-8",
+                            data: {
+                                dpId: $('#DetailPlanId').val(),
+                                userId: $('#UserId').val()
+                            },
+                            success: function (data, status) {
+                                assingTaskSuccess(data, status);
+                            },
+                            error: function (data, status) {
+                                assigTaskError(data, status);
+                            }
+                        })
+                    }
+                    else if (result.dismiss === swal.DismissReason.cancel)/* Silmekten Vazgeçti */ {
+                        console.log('Hayır');
+                    }
+                });
+            });
+
+
+
+            $('#openDetailDoc').click(function () {
+                var model = {
+                    SelectedShiftId: $('#SelectedShiftId').val(),
+                    SelectedMachineId: $('#SelectedMachineId').val(),
+                    WorkOrderDate: moment($('#WorkOrderDate').val(), 'DD/MM/YYYY').format('YYYY/MM/DD')
+                }
+                $.ajax({
+                    type: "GET",
+                    url: "/WorkOrder/GetPlanDetailForWo",
+                    contentType: "application/json; charset=utf-8",
+                    data: model,
+                    async: false,
+                    success: function (data, status) {
+
+                        if (data.PlanDetailDto !== null) {
+                            $('#workOrder').show();
+                            $('#workOrderPrdDtl').show();
+                            $('#DetailPlanId').val(data.PlanDetailDto.DpId);
+                            $('#SemiProductName').text(data.PlanDetailDto.SemiProductName);
+                            $('#SemiProductDetailInfo').text(data.PlanDetailDto.SemiProductCode + " " + data.PlanDetailDto.SemiProductDescription);
+                            $('#planedAmount').text(data.PlanDetailDto.MGPAmount);
+                            $('#MachineCode').text(data.PlanDetailDto.MachineCode + " " + data.PlanDetailDto.MachineName);
+                            $('#ShiftCode').text(data.PlanDetailDto.ShiftName);
+                            var MyDate_String_Value = data.PlanDetailDto.DpDate
+                            var wrkDate = new Date(parseInt(MyDate_String_Value.replace(/(^.*\()|([+-].*$)/g, '')));
+
+                            console.log(moment(wrkDate).valueOf())
+                            $('#ProduceDate').text(moment(wrkDate).format('DD/MM/YYYY'));
+                            for (var i = 0; i < data.mixBySemiProductDto.length; i++) {
+
+                                $('#Detail > tbody').append('<tr class="table-active table-border-double">' +
+                                    '<td colspan="6">' + data.mixBySemiProductDto[i].MixtureCode + ' ' + data.mixBySemiProductDto[i].MixtureName + '</td> </tr>');
+
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/WorkOrder/GetComponentForMix",
+                                    contentType: "application/json; charset=utf-8",
+                                    dataType: "json",
+                                    async: false,
+                                    data: {
+                                        mixId: data.mixBySemiProductDto[i].MixtureId
+                                    },
+                                    success: function (data, status) {
+                                        for (var j = 0; j < data.length; j++) {
+                                            debugger;
+                                            $('#Detail > tbody').append('<tr>' +
+                                                '<td><span class="text-muted">' + data[j].ComponentCode + '</span></td>' +
+                                                '<td><span class="text-success-600">' + data[j].ComponentName + '</span></td>' +
+                                                '<td><h6 class="font-weight-semibold mb-0">' + data[j].ComponentRate + '</h6></td></tr >');
+                                        }
+
+                                    },
+                                    error: function (xhr, status, err) {
+                                        alert('error')
+
+                                    }
+                                })
+
+                            }
+
+                        } else {
+                            swal({
+                                title: 'Hata',
+                                text: 'Seçilen kriterler için kayıt bulunamadı.',
+                                type: 'warning',
+                                showCancelButton: false,
+                                buttonsStyling: false,
+                                confirmButtonClass: 'btn btn-primary',
+                                confirmButtonText: 'Tamam'
+                            });
+
+
+                        }
+
+
+                    },
+                    error: function (xhr, status, err) {
+                        swal({
+                            title: 'Hata',
+                            text: 'İşlem Sırasında Hata Alındı. Sistem Yöneticinize İletiniz.',
+                            type: 'error',
+                            showCancelButton: false,
+                            buttonsStyling: false,
+                            confirmButtonClass: 'btn btn-primary',
+                            confirmButtonText: 'Tamam'
+                        });
+
+                    }
+                });
+
+            })
+        })
+
+
+        function assingTaskSuccess(data, status) {
+            console.log(13123);
+            console.log(data);
+            var id = data.ResultValue.Id;
+            swal({
+                title: 'Onay!',
+                text: 'İşlem Başarıyla Tamamlandı',
+                type: 'success',
+                buttonsStyling: false,
+                confirmButtonClass: 'btn btn-primary',
+                confirmButtonText: 'Tamam'
+            }).then(function () {
+
+
+                window.location = "/WorkOrder/WrkOrdDetail?wrkOrdId=" + id;
+            });;
+
+        }
+        function assigTaskError(data, status) {
+            alert('Hatalı3');
+        }
+
+
+</script>
+
+}
+

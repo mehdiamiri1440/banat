@@ -1,0 +1,88 @@
+﻿@model Ginosis.Banat.MvcWebUI.Models.ExcelData.MoldExcelViewModel
+@{
+    ViewBag.Title = "SemiPrdDtlAddData";
+    Layout = "~/Views/_LayoutPage2.cshtml";
+}
+
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h6 class="card-title">Yarı Mamül Bilgileri</h6>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("SemiPrdDtlAddFromExcel", "Data", FormMethod.Post, new { @id = "MoldAddFromExcel", @class = "DataForm", enctype = "multipart/form-data" }))
+        {
+            <div class="form-group row">
+                <div class="col-lg-4">
+                    <div class="row">
+                        <label class="col-md-3 col-form-label">Yarı Mamül Dosyası:</label>
+                        <div class="col-md-9">
+                            @Html.TextBoxFor(x => x.excelFile, new { type = "file", @placeholder = "Plan Dosyası", @class = "form-control", @name = "excelFile", @id = "excelFile", @autocomplete = "off" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-success col-md-12" id="uploadFile2"><i class="icon-database-insert mr-2"></i> Sisteme Yükle</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+
+        $('#uploadFile2').click(function () {
+            if ($('#excelFile').val()) {
+                uploadexcl();
+            }
+            else {
+                swal({
+                    title: 'Hata',
+                    text: 'Yüklenecek Dosyayı Seçiniz!',
+                    type: 'error',
+                    buttonsStyling: false,
+                    confirmButtonClass: 'btn btn-primary',
+                    confirmButtonText: 'Tamam'
+                });
+            }
+        });
+
+
+    })
+
+
+
+    function uploadexcl() {
+        var formdata = new FormData(); //FormData object
+        var fileInput = document.getElementById('excelFile');
+        //Iterating through each files selected in fileInput
+        for (i = 0; i < fileInput.files.length; i++) {
+            //Appending each file to FormData object
+            formdata.append(fileInput.files[i].name, fileInput.files[i]);
+        }
+        //Creating an XMLHttpRequest and sending
+        var xhr = new XMLHttpRequest();
+        var url = '/Data/SemiPrdDtlAddFromExcel';
+        xhr.open('POST', url);
+        xhr.send(formdata);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var jsonResponse = JSON.parse(xhr.responseText);
+                swal({
+                    title: 'Onay!',
+                    text: jsonResponse.ReturnMessage,
+                    type: 'success',
+                    buttonsStyling: false,
+                    confirmButtonClass: 'btn btn-primary',
+                    confirmButtonText: 'Tamam'
+                });
+            }
+        }
+        return false;
+    }
+</script>
