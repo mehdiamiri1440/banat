@@ -185,22 +185,32 @@
                             success: function (data, status) {
                                 endloading();
                                 var docName=data.result.ResultValue;
-                                swal({
-                                    title: 'Onay!',
-                                    text: 'İşlem Başarıyla Tamamlandı',
-                                    type: 'success',
-                                    buttonsStyling: false,
-                                    confirmButtonClass: 'btn btn-primary',
-                                    confirmButtonText: 'Tamam'
-                                }).then((result) => {
-                                    if (result.value) {
-                                       
-                                        debugger;
-                                        var url = '@Url.Action("GeneratePDF", "WorkOrder")?fileName=' + docName;
-                                        window.open(url, "_blank");
-                                        //window.location.href = url;
-                                    }
-                                });
+                                if(docName)
+                                    swal({
+                                        title: 'Onay!',
+                                        text: 'İşlem Başarıyla Tamamlandı',
+                                        type: 'success',
+                                        buttonsStyling: false,
+                                        confirmButtonClass: 'btn btn-primary',
+                                        confirmButtonText: 'Tamam'
+                                    }).then((result) => {
+                                        if (result.value) {
+                                        
+                                            debugger;
+                                            var url = '@Url.Action("GeneratePDF", "WorkOrder")?fileName=' + docName;
+                                            window.open(url, "_blank");
+                                            //window.location.href = url;
+                                        }
+                                    });
+                                else 
+                                    swal({
+                                        title: 'Onay!',
+                                        text: 'İşlem Hatalı.Sistem Yöneticisine İletiniz',
+                                        type: 'error',
+                                        buttonsStyling: false,
+                                        confirmButtonClass: 'btn btn-primary',
+                                        confirmButtonText: 'Tamam'
+                                    });
 
                             },
                             error: function (data, status) {
